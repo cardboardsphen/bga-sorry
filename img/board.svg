@@ -1,0 +1,2450 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="900"
+   height="900"
+   version="1.1"
+   viewBox="0 0 900 900"
+   id="svg279"
+   sodipodi:docname="board.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview279"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showguides="false"
+     inkscape:zoom="1.8667296"
+     inkscape:cx="455.3418"
+     inkscape:cy="414.62889"
+     inkscape:window-width="1762"
+     inkscape:window-height="788"
+     inkscape:window-x="142"
+     inkscape:window-y="78"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg279" />
+  <defs
+     id="defs98">
+    <marker
+       id="marker33827"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g6">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path1" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path2" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path3" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path4" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path5" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path6" />
+      </g>
+    </marker>
+    <marker
+       id="marker33391"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g12">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path7" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path8" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path9" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path10" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path11" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path12" />
+      </g>
+    </marker>
+    <marker
+       id="marker31537"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g18">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path13" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path14" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path15" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path16" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path17" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path18" />
+      </g>
+    </marker>
+    <marker
+       id="marker31149"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g24">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path19" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path20" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path21" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path22" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path23" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path24" />
+      </g>
+    </marker>
+    <marker
+       id="marker29967"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g30">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path25" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path26" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path27" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path28" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path29" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path30" />
+      </g>
+    </marker>
+    <marker
+       id="marker29627"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g36">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path31" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path32" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path33" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path34" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path35" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path36" />
+      </g>
+    </marker>
+    <marker
+       id="marker27581"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g42">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path37" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path38" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path39" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path40" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path41" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path42" />
+      </g>
+    </marker>
+    <marker
+       id="marker27289"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g48">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path43" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path44" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path45" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path46" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path47" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path48" />
+      </g>
+    </marker>
+    <marker
+       id="marker26107"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g54">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path49" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path50" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path51" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path52" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path53" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path54" />
+      </g>
+    </marker>
+    <marker
+       id="marker25863"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g60">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path55" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path56" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path57" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path58" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path59" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path60" />
+      </g>
+    </marker>
+    <marker
+       id="marker24105"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g66">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path61" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path62" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path63" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path64" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path65" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path66" />
+      </g>
+    </marker>
+    <marker
+       id="marker23909"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g72">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path67" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path68" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path69" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path70" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path71" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path72" />
+      </g>
+    </marker>
+    <marker
+       id="marker21575"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g78">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path73" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path74" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path75" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path76" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path77" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path78" />
+      </g>
+    </marker>
+    <marker
+       id="marker21427"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g84">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path79" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path80" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path81" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path82" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path83" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path84" />
+      </g>
+    </marker>
+    <marker
+       id="Tail"
+       overflow="visible"
+       orient="auto">
+      <g
+         transform="scale(-1.2)"
+         id="g90">
+        <path
+           d="m-3.8049-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path85" />
+        <path
+           d="m-1.2867-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path86" />
+        <path
+           d="m1.3054-3.9585 4.3484 3.9585"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path87" />
+        <path
+           d="m-3.8049 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path88" />
+        <path
+           d="m-1.2867 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path89" />
+        <path
+           d="m1.3054 4.1776 4.3484-3.9578"
+           fill-rule="evenodd"
+           stroke="#000"
+           stroke-linecap="round"
+           stroke-width=".8"
+           id="path90" />
+      </g>
+    </marker>
+    <marker
+       id="marker19476"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path91" />
+    </marker>
+    <marker
+       id="marker19088"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path92" />
+    </marker>
+    <marker
+       id="marker18814"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path93" />
+    </marker>
+    <marker
+       id="marker18386"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path94" />
+    </marker>
+    <marker
+       id="marker18310"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path95" />
+    </marker>
+    <marker
+       id="marker17780"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path96" />
+    </marker>
+    <marker
+       id="marker17752"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path97" />
+    </marker>
+    <marker
+       id="Arrow1Lend"
+       overflow="visible"
+       orient="auto">
+      <path
+         transform="scale(.8) rotate(180) translate(12.5)"
+         d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+         fill-rule="evenodd"
+         stroke="#000"
+         stroke-width="1pt"
+         id="path98" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata98">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0 -222.52)"
+     id="g98">
+    <rect
+       x="10"
+       y="232.52"
+       width="880"
+       height="880"
+       rx="25"
+       ry="25"
+       fill="#8cf"
+       stroke="#000"
+       stroke-width="20"
+       id="rect98" />
+  </g>
+  <g
+     id="g216">
+    <g
+       id="g101">
+      <g
+         stroke="#000"
+         stroke-width="2"
+         id="g100">
+        <rect
+           x="500"
+           y="150"
+           width="50"
+           height="50"
+           id="rect99" />
+        <circle
+           cx="500"
+           cy="175"
+           r="50"
+           fill="#fff"
+           id="circle99" />
+        <circle
+           cx="500"
+           cy="175"
+           r="45"
+           id="circle100" />
+      </g>
+      <path
+         d="m450 175 25 14.434v28.868l24.998-14.435 25 14.434v-28.868l25-14.434-25-14.434v-28.868l-24.998 14.435-25.002-14.433v28.866z"
+         fill="#fc0"
+         stroke="#fff"
+         stroke-linejoin="bevel"
+         stroke-width="8"
+         id="path100" />
+      <path
+         d="m450 175 25 14.434v28.868l24.998-14.435 25 14.434v-28.868l25-14.434-25-14.434v-28.868l-24.998 14.435-25.002-14.433v28.866z"
+         fill="#48f"
+         stroke="#000"
+         stroke-linejoin="bevel"
+         stroke-width="2"
+         id="path101" />
+    </g>
+    <circle
+       cx="500"
+       cy="175"
+       r="50"
+       fill="none"
+       stroke="#000"
+       stroke-width="2"
+       id="circle101" />
+    <g
+       id="g104">
+      <g
+         stroke="#000"
+         stroke-width="2"
+         id="g103">
+        <rect
+           x="150"
+           y="350"
+           width="50"
+           height="50"
+           id="rect101" />
+        <circle
+           cx="175"
+           cy="400"
+           r="50"
+           fill="#fff"
+           id="circle102" />
+        <circle
+           cx="175"
+           cy="400"
+           r="45"
+           id="circle103" />
+      </g>
+      <path
+         d="m175 350-14.434 25-28.868 2e-3 14.435 24.998-14.434 25 28.868 1e-5 14.434 25 14.434-25 28.868-2e-3 -14.435-24.998 14.433-25.002-28.867 2e-3z"
+         fill="#fc0"
+         stroke="#fff"
+         stroke-linejoin="bevel"
+         stroke-width="8"
+         id="path103" />
+      <path
+         d="m175 350-14.434 25-28.868 2e-3 14.435 24.998-14.434 25 28.868 1e-5 14.434 25 14.434-25 28.868-2e-3 -14.435-24.998 14.433-25.002-28.867 2e-3z"
+         fill="#f00"
+         stroke="#000"
+         stroke-linejoin="bevel"
+         stroke-width="2"
+         id="path104" />
+    </g>
+    <circle
+       cx="175"
+       cy="400"
+       r="50"
+       fill="none"
+       stroke="#000"
+       stroke-width="2"
+       id="circle104" />
+    <g
+       id="g107">
+      <g
+         stroke="#000"
+         stroke-width="2"
+         id="g106">
+        <rect
+           x="350"
+           y="700"
+           width="50"
+           height="50"
+           id="rect104" />
+        <circle
+           cx="400"
+           cy="725"
+           r="50"
+           fill="#fff"
+           id="circle105" />
+        <circle
+           cx="400"
+           cy="725"
+           r="45"
+           id="circle106" />
+      </g>
+      <path
+         d="m350 725 25 14.434v28.868l24.998-14.435 25 14.434v-28.868l25-14.434-25-14.434v-28.868l-24.998 14.435-25.002-14.433v28.866z"
+         fill="#fc0"
+         stroke="#fff"
+         stroke-linejoin="bevel"
+         stroke-width="8"
+         id="path106" />
+      <path
+         d="m350 725 25 14.434v28.868l24.998-14.435 25 14.434v-28.868l25-14.434-25-14.434v-28.868l-24.998 14.435-25.002-14.433v28.866z"
+         fill="#0c4"
+         stroke="#000"
+         stroke-linejoin="bevel"
+         stroke-width="2"
+         id="path107" />
+    </g>
+    <circle
+       cx="400"
+       cy="725"
+       r="50"
+       fill="none"
+       stroke="#000"
+       stroke-width="2"
+       id="circle107" />
+    <g
+       stroke="#000"
+       stroke-width="2"
+       id="g111">
+      <rect
+         x="750"
+         y="250"
+         width="50"
+         height="50"
+         id="rect107" />
+      <rect
+         x="700"
+         y="500"
+         width="50"
+         height="50"
+         id="rect108" />
+      <rect
+         x="600"
+         y="750"
+         width="50"
+         height="50"
+         id="rect109" />
+      <rect
+         x="100"
+         y="600"
+         width="50"
+         height="50"
+         id="rect110" />
+      <rect
+         x="250"
+         y="100"
+         width="50"
+         height="50"
+         id="rect111" />
+    </g>
+    <g
+       fill="#fff"
+       stroke="#000"
+       stroke-width="2"
+       id="g191">
+      <rect
+         x="50"
+         y="50"
+         width="50"
+         height="50"
+         id="rect112" />
+      <rect
+         x="100"
+         y="50"
+         width="50"
+         height="50"
+         id="rect113" />
+      <rect
+         x="150"
+         y="50"
+         width="50"
+         height="50"
+         id="rect114" />
+      <rect
+         x="200"
+         y="50"
+         width="50"
+         height="50"
+         id="rect115" />
+      <rect
+         x="250"
+         y="50"
+         width="50"
+         height="50"
+         id="rect116" />
+      <rect
+         x="300"
+         y="50"
+         width="50"
+         height="50"
+         id="rect117" />
+      <rect
+         x="350"
+         y="50"
+         width="50"
+         height="50"
+         id="rect118" />
+      <rect
+         x="400"
+         y="50"
+         width="50"
+         height="50"
+         id="rect119" />
+      <rect
+         x="450"
+         y="50"
+         width="50"
+         height="50"
+         id="rect120" />
+      <rect
+         x="500"
+         y="50"
+         width="50"
+         height="50"
+         id="rect121" />
+      <rect
+         x="550"
+         y="50"
+         width="50"
+         height="50"
+         id="rect122" />
+      <rect
+         x="600"
+         y="50"
+         width="50"
+         height="50"
+         id="rect123" />
+      <rect
+         x="650"
+         y="50"
+         width="50"
+         height="50"
+         id="rect124" />
+      <rect
+         x="700"
+         y="50"
+         width="50"
+         height="50"
+         id="rect125" />
+      <rect
+         x="750"
+         y="50"
+         width="50"
+         height="50"
+         id="rect126" />
+      <rect
+         x="800"
+         y="50"
+         width="50"
+         height="50"
+         id="rect127" />
+      <rect
+         x="800"
+         y="100"
+         width="50"
+         height="50"
+         id="rect128" />
+      <rect
+         x="800"
+         y="150"
+         width="50"
+         height="50"
+         id="rect129" />
+      <rect
+         x="800"
+         y="200"
+         width="50"
+         height="50"
+         id="rect130" />
+      <rect
+         x="800"
+         y="250"
+         width="50"
+         height="50"
+         id="rect131" />
+      <rect
+         x="800"
+         y="300"
+         width="50"
+         height="50"
+         id="rect132" />
+      <rect
+         x="800"
+         y="350"
+         width="50"
+         height="50"
+         id="rect133" />
+      <rect
+         x="800"
+         y="400"
+         width="50"
+         height="50"
+         id="rect134" />
+      <rect
+         x="800"
+         y="450"
+         width="50"
+         height="50"
+         id="rect135" />
+      <rect
+         x="800"
+         y="500"
+         width="50"
+         height="50"
+         id="rect136" />
+      <rect
+         x="800"
+         y="550"
+         width="50"
+         height="50"
+         id="rect137" />
+      <rect
+         x="800"
+         y="600"
+         width="50"
+         height="50"
+         id="rect138" />
+      <rect
+         x="800"
+         y="650"
+         width="50"
+         height="50"
+         id="rect139" />
+      <rect
+         x="800"
+         y="700"
+         width="50"
+         height="50"
+         id="rect140" />
+      <rect
+         x="800"
+         y="750"
+         width="50"
+         height="50"
+         id="rect141" />
+      <rect
+         x="800"
+         y="800"
+         width="50"
+         height="50"
+         id="rect142" />
+      <rect
+         x="50"
+         y="100"
+         width="50"
+         height="50"
+         id="rect143" />
+      <rect
+         x="50"
+         y="150"
+         width="50"
+         height="50"
+         id="rect144" />
+      <rect
+         x="50"
+         y="200"
+         width="50"
+         height="50"
+         id="rect145" />
+      <rect
+         x="50"
+         y="250"
+         width="50"
+         height="50"
+         id="rect146" />
+      <rect
+         x="50"
+         y="300"
+         width="50"
+         height="50"
+         id="rect147" />
+      <rect
+         x="50"
+         y="350"
+         width="50"
+         height="50"
+         id="rect148" />
+      <rect
+         x="50"
+         y="400"
+         width="50"
+         height="50"
+         id="rect149" />
+      <rect
+         x="50"
+         y="450"
+         width="50"
+         height="50"
+         id="rect150" />
+      <rect
+         x="50"
+         y="500"
+         width="50"
+         height="50"
+         id="rect151" />
+      <rect
+         x="50"
+         y="550"
+         width="50"
+         height="50"
+         id="rect152" />
+      <rect
+         x="50"
+         y="600"
+         width="50"
+         height="50"
+         id="rect153" />
+      <rect
+         x="50"
+         y="650"
+         width="50"
+         height="50"
+         id="rect154" />
+      <rect
+         x="50"
+         y="700"
+         width="50"
+         height="50"
+         id="rect155" />
+      <rect
+         x="50"
+         y="750"
+         width="50"
+         height="50"
+         id="rect156" />
+      <rect
+         x="50"
+         y="800"
+         width="50"
+         height="50"
+         id="rect157" />
+      <rect
+         x="100"
+         y="800"
+         width="50"
+         height="50"
+         id="rect158" />
+      <rect
+         x="150"
+         y="800"
+         width="50"
+         height="50"
+         id="rect159" />
+      <rect
+         x="200"
+         y="800"
+         width="50"
+         height="50"
+         id="rect160" />
+      <rect
+         x="250"
+         y="800"
+         width="50"
+         height="50"
+         id="rect161" />
+      <rect
+         x="300"
+         y="800"
+         width="50"
+         height="50"
+         id="rect162" />
+      <rect
+         x="350"
+         y="800"
+         width="50"
+         height="50"
+         id="rect163" />
+      <rect
+         x="400"
+         y="800"
+         width="50"
+         height="50"
+         id="rect164" />
+      <rect
+         x="450"
+         y="800"
+         width="50"
+         height="50"
+         id="rect165" />
+      <rect
+         x="500"
+         y="800"
+         width="50"
+         height="50"
+         id="rect166" />
+      <rect
+         x="550"
+         y="800"
+         width="50"
+         height="50"
+         id="rect167" />
+      <rect
+         x="600"
+         y="800"
+         width="50"
+         height="50"
+         id="rect168" />
+      <rect
+         x="650"
+         y="800"
+         width="50"
+         height="50"
+         id="rect169" />
+      <rect
+         x="700"
+         y="800"
+         width="50"
+         height="50"
+         id="rect170" />
+      <rect
+         x="750"
+         y="800"
+         width="50"
+         height="50"
+         id="rect171" />
+      <rect
+         x="100"
+         y="700"
+         width="50"
+         height="50"
+         id="rect172" />
+      <rect
+         x="150"
+         y="700"
+         width="50"
+         height="50"
+         id="rect173" />
+      <rect
+         x="200"
+         y="700"
+         width="50"
+         height="50"
+         id="rect174" />
+      <rect
+         x="250"
+         y="700"
+         width="50"
+         height="50"
+         id="rect175" />
+      <rect
+         x="300"
+         y="700"
+         width="50"
+         height="50"
+         id="rect176" />
+      <rect
+         x="150"
+         y="100"
+         width="50"
+         height="50"
+         id="rect177" />
+      <rect
+         x="150"
+         y="150"
+         width="50"
+         height="50"
+         id="rect178" />
+      <rect
+         x="150"
+         y="200"
+         width="50"
+         height="50"
+         id="rect179" />
+      <rect
+         x="150"
+         y="250"
+         width="50"
+         height="50"
+         id="rect180" />
+      <rect
+         x="150"
+         y="300"
+         width="50"
+         height="50"
+         id="rect181" />
+      <rect
+         x="550"
+         y="150"
+         width="50"
+         height="50"
+         id="rect182" />
+      <rect
+         x="600"
+         y="150"
+         width="50"
+         height="50"
+         id="rect183" />
+      <rect
+         x="650"
+         y="150"
+         width="50"
+         height="50"
+         id="rect184" />
+      <rect
+         x="700"
+         y="150"
+         width="50"
+         height="50"
+         id="rect185" />
+      <rect
+         x="750"
+         y="150"
+         width="50"
+         height="50"
+         id="rect186" />
+      <rect
+         x="700"
+         y="550"
+         width="50"
+         height="50"
+         id="rect187" />
+      <rect
+         x="700"
+         y="600"
+         width="50"
+         height="50"
+         id="rect188" />
+      <rect
+         x="700"
+         y="650"
+         width="50"
+         height="50"
+         id="rect189" />
+      <rect
+         x="700"
+         y="700"
+         width="50"
+         height="50"
+         id="rect190" />
+      <rect
+         x="700"
+         y="750"
+         width="50"
+         height="50"
+         id="rect191" />
+    </g>
+    <g
+       stroke="#000"
+       stroke-width="2"
+       id="g194">
+      <circle
+         cx="625"
+         cy="750"
+         r="50"
+         fill="#fc0"
+         id="circle191" />
+      <circle
+         cx="725"
+         cy="500"
+         r="50"
+         fill="#fff"
+         id="circle192" />
+      <circle
+         cx="150"
+         cy="625"
+         r="50"
+         fill="#0c4"
+         id="circle193" />
+      <circle
+         cx="275"
+         cy="150"
+         r="50"
+         fill="#f00"
+         id="circle194" />
+    </g>
+    <g
+       fill="#48f"
+       stroke="#000"
+       id="g200">
+      <circle
+         cx="750"
+         cy="275"
+         r="50"
+         stroke-width="2"
+         id="circle195" />
+      <g
+         stroke-width=".75"
+         id="g199">
+        <rect
+           x="555"
+           y="155"
+           width="40"
+           height="40"
+           id="rect195" />
+        <rect
+           x="605"
+           y="155"
+           width="40"
+           height="40"
+           id="rect196" />
+        <rect
+           x="655"
+           y="155"
+           width="40"
+           height="40"
+           id="rect197" />
+        <rect
+           x="705"
+           y="155"
+           width="40"
+           height="40"
+           id="rect198" />
+        <rect
+           x="755"
+           y="155"
+           width="40"
+           height="40"
+           id="rect199" />
+      </g>
+    </g>
+    <g
+       stroke="#000"
+       stroke-width=".75"
+       id="g202">
+      <rect
+         x="705"
+         y="555"
+         width="40"
+         height="40"
+         fill="#fc0"
+         id="rect200" />
+      <rect
+         x="305"
+         y="705"
+         width="40"
+         height="40"
+         fill="#0c4"
+         id="rect201" />
+      <rect
+         x="155"
+         y="305"
+         width="40"
+         height="40"
+         fill="#f00"
+         id="rect202" />
+    </g>
+    <g
+       fill="#fc0"
+       stroke="#000"
+       stroke-width=".75"
+       id="g206">
+      <rect
+         x="705"
+         y="605"
+         width="40"
+         height="40"
+         id="rect203" />
+      <rect
+         x="705"
+         y="655"
+         width="40"
+         height="40"
+         id="rect204" />
+      <rect
+         x="705"
+         y="705"
+         width="40"
+         height="40"
+         id="rect205" />
+      <rect
+         x="705"
+         y="755"
+         width="40"
+         height="40"
+         id="rect206" />
+    </g>
+    <g
+       fill="#0c4"
+       stroke="#000"
+       stroke-width=".75"
+       id="g210">
+      <rect
+         x="255"
+         y="705"
+         width="40"
+         height="40"
+         id="rect207" />
+      <rect
+         x="205"
+         y="705"
+         width="40"
+         height="40"
+         id="rect208" />
+      <rect
+         x="155"
+         y="705"
+         width="40"
+         height="40"
+         id="rect209" />
+      <rect
+         x="105"
+         y="705"
+         width="40"
+         height="40"
+         id="rect210" />
+    </g>
+    <g
+       fill="#f00"
+       stroke="#000"
+       stroke-width=".75"
+       id="g214">
+      <rect
+         x="155"
+         y="255"
+         width="40"
+         height="40"
+         id="rect211" />
+      <rect
+         x="155"
+         y="205"
+         width="40"
+         height="40"
+         id="rect212" />
+      <rect
+         x="155"
+         y="155"
+         width="40"
+         height="40"
+         id="rect213" />
+      <rect
+         x="155"
+         y="105"
+         width="40"
+         height="40"
+         id="rect214" />
+    </g>
+    <g
+       id="g215">
+      <circle
+         cx="725"
+         cy="500"
+         r="45"
+         stroke="#000"
+         stroke-width="2"
+         id="circle214" />
+      <path
+         d="m725 450-14.434 25-28.868 2e-3 14.435 24.998-14.434 25 28.868 1e-5 14.434 25 14.434-25 28.868-2e-3 -14.435-24.998 14.433-25.002-28.867 2e-3z"
+         fill="#fc0"
+         stroke="#fff"
+         stroke-linejoin="bevel"
+         stroke-width="8"
+         id="path214" />
+      <path
+         d="m725 450-14.434 25-28.868 2e-3 14.435 24.998-14.434 25 28.868 1e-5 14.434 25 14.434-25 28.868-2e-3 -14.435-24.998 14.433-25.002-28.867 2e-3z"
+         fill="#fc0"
+         stroke="#000"
+         stroke-linejoin="bevel"
+         stroke-width="2"
+         id="path215" />
+    </g>
+    <circle
+       cx="725"
+       cy="500"
+       r="50"
+       fill="none"
+       stroke="#000"
+       stroke-width="2"
+       id="circle215" />
+  </g>
+  <g
+     stroke="#000"
+     id="g243">
+    <g
+       fill="#0c4"
+       stroke-width="2"
+       id="g220">
+      <path
+         d="m90 790h-30l15-25.981z"
+         id="path216" />
+      <path
+         d="m90 390h-30l15-25.981z"
+         id="path217" />
+      <g
+         id="g219">
+        <circle
+           cx="75"
+           cy="175"
+           r="15"
+           id="circle217" />
+        <circle
+           cx="75"
+           cy="625"
+           r="15"
+           id="circle218" />
+        <rect
+           x="67.5"
+           y="625"
+           width="15"
+           height="160"
+           id="rect218" />
+        <rect
+           x="67.5"
+           y="175"
+           width="15"
+           height="210"
+           id="rect219" />
+      </g>
+    </g>
+    <g
+       fill="#48f"
+       stroke-width="2"
+       id="g224">
+      <path
+         d="m810 510h30l-15 25.981z"
+         id="path220" />
+      <path
+         d="m810 110h30l-15 25.981z"
+         id="path221" />
+      <g
+         id="g223">
+        <circle
+           cx="825"
+           cy="725"
+           r="15"
+           id="circle221" />
+        <circle
+           cx="825"
+           cy="275"
+           r="15"
+           id="circle222" />
+        <rect
+           x="817.5"
+           y="115"
+           width="15"
+           height="160"
+           id="rect222" />
+        <rect
+           x="817.5"
+           y="515"
+           width="15"
+           height="210"
+           id="rect223" />
+      </g>
+    </g>
+    <g
+       fill="#fc0"
+       stroke-width="2"
+       id="g226">
+      <path
+         d="m510 90v-30l25.981 15z"
+         id="path224" />
+      <path
+         d="m110 90v-30l25.981 15z"
+         id="path225" />
+      <circle
+         cx="725"
+         cy="75"
+         r="15"
+         id="circle225" />
+      <circle
+         cx="275"
+         cy="75"
+         r="15"
+         id="circle226" />
+    </g>
+    <rect
+       x="515"
+       y="67.5"
+       width="210"
+       height="15"
+       fill="#f00"
+       stroke-width="2"
+       id="rect226" />
+    <rect
+       x="115"
+       y="67.5"
+       width="160"
+       height="15"
+       fill="#f00"
+       stroke-width="2"
+       id="rect227" />
+    <g
+       fill="#fc0"
+       id="g230">
+      <g
+         stroke-width="2"
+         id="g228">
+        <circle
+           cx="625"
+           cy="825"
+           r="15"
+           id="circle227" />
+        <path
+           d="m790 810v30l-25.981-15z"
+           id="path227" />
+        <rect
+           x="625"
+           y="817.5"
+           width="160"
+           height="15"
+           id="rect228" />
+      </g>
+      <circle
+         cx="625"
+         cy="825"
+         r="15"
+         stroke-width=".75"
+         id="circle228" />
+      <path
+         d="m790 810v30l-25.981-15z"
+         stroke-width=".75"
+         id="path228" />
+      <g
+         stroke-width="2"
+         id="g229">
+        <circle
+           cx="175"
+           cy="825"
+           r="15"
+           id="circle229" />
+        <path
+           d="m390 810v30l-25.981-15z"
+           id="path229" />
+        <rect
+           x="175"
+           y="817.5"
+           width="210"
+           height="15"
+           id="rect229" />
+      </g>
+      <circle
+         cx="175"
+         cy="825"
+         r="15"
+         stroke-width=".75"
+         id="circle230" />
+      <path
+         d="m390 810v30l-25.981-15z"
+         stroke-width=".75"
+         id="path230" />
+    </g>
+    <g
+       stroke-width=".75"
+       id="g242">
+      <path
+         d="m810 510h30l-15 25.981z"
+         fill="#48f"
+         id="path231" />
+      <path
+         d="m810 110h30l-15 25.981z"
+         fill="#48f"
+         id="path232" />
+      <path
+         d="m510 90v-30l25.981 15z"
+         fill="#f00"
+         id="path233" />
+      <path
+         d="m110 90v-30l25.981 15z"
+         fill="#f00"
+         id="path234" />
+      <path
+         d="m90 790h-30l15-25.981z"
+         fill="#0c4"
+         id="path235" />
+      <path
+         d="m90 390h-30l15-25.981z"
+         fill="#0c4"
+         id="path236" />
+      <g
+         id="g241">
+        <circle
+           cx="825"
+           cy="725"
+           r="15"
+           fill="#48f"
+           id="circle236" />
+        <circle
+           cx="825"
+           cy="275"
+           r="15"
+           fill="#48f"
+           id="circle237" />
+        <circle
+           cx="725"
+           cy="75"
+           r="15"
+           fill="#f00"
+           id="circle238" />
+        <circle
+           cx="275"
+           cy="75"
+           r="15"
+           fill="#f00"
+           id="circle239" />
+        <circle
+           cx="75"
+           cy="175"
+           r="15"
+           fill="#0c4"
+           id="circle240" />
+        <circle
+           cx="75"
+           cy="625"
+           r="15"
+           fill="#0c4"
+           id="circle241" />
+      </g>
+    </g>
+  </g>
+  <g
+     fill="none"
+     stroke="#000"
+     id="g259">
+    <g
+       id="g250">
+      <path
+         d="m825 825h-75s-10 0-17.5-7.5-7.5-17.5-7.5-17.5v-25"
+         marker-end="url(#Arrow1Lend)"
+         id="path243" />
+      <path
+         d="m625 775v25s0.83224 10.023-7.0723 17.928-17.928 7.0723-17.928 7.0723h-25"
+         marker-end="url(#marker17752)"
+         id="path244" />
+      <path
+         d="m75 825v-75s0-10 7.5-17.5 17.5-7.5 17.5-7.5h25"
+         marker-end="url(#marker17780)"
+         id="path245" />
+      <path
+         d="m125 625h-25s-10.023 0.83224-17.928-7.0723-7.0723-17.928-7.0723-17.928v-25"
+         marker-end="url(#marker19476)"
+         id="path246" />
+      <path
+         d="m75 75h75s10 0 17.5 7.5 7.5 17.5 7.5 17.5v25"
+         marker-end="url(#marker18310)"
+         id="path247" />
+      <path
+         d="m275 125v-25s-0.83224-10.023 7.0723-17.928 17.928-7.0723 17.928-7.0723h25"
+         marker-end="url(#marker18386)"
+         id="path248" />
+      <path
+         d="m825 75v75s0 10-7.5 17.5-17.5 7.5-17.5 7.5h-25"
+         marker-end="url(#marker18814)"
+         id="path249" />
+      <path
+         d="m775 275h25s10.023-0.83224 17.928 7.0723 7.0723 17.928 7.0723 17.928v25"
+         marker-end="url(#marker19088)"
+         id="path250" />
+    </g>
+    <g
+       stroke-width="1px"
+       id="g258">
+      <path
+         d="m821.11 825.13h10"
+         marker-end="url(#Tail)"
+         marker-start="url(#Tail)"
+         id="path251" />
+      <path
+         d="m625.13 778.89v-10"
+         marker-end="url(#marker21575)"
+         marker-start="url(#marker21427)"
+         id="path252" />
+      <path
+         d="m121.11 625.13h10"
+         marker-end="url(#marker24105)"
+         marker-start="url(#marker23909)"
+         id="path253" />
+      <path
+         d="m75 820v10"
+         marker-end="url(#marker26107)"
+         marker-start="url(#marker25863)"
+         id="path254" />
+      <path
+         d="m80 75h-10"
+         marker-end="url(#marker27581)"
+         marker-start="url(#marker27289)"
+         id="path255" />
+      <path
+         d="m275 120v10"
+         marker-end="url(#marker29967)"
+         marker-start="url(#marker29627)"
+         id="path256" />
+      <path
+         d="m778.89 274.87h-10"
+         marker-end="url(#marker31537)"
+         marker-start="url(#marker31149)"
+         id="path257" />
+      <path
+         d="m825.13 78.891v-10"
+         marker-end="url(#marker33827)"
+         marker-start="url(#marker33391)"
+         id="path258" />
+    </g>
+  </g>
+  <g
+     fill="#000000"
+     font-family="sans-serif"
+     text-anchor="middle"
+     word-spacing="0px"
+     id="g279">
+    <text
+       x="625"
+       y="756.99988"
+       font-size="40px"
+       letter-spacing="0px"
+       text-align="center"
+       style="line-height:1.25"
+       xml:space="preserve"
+       id="text259"><tspan
+         x="625"
+         y="756.99988"
+         font-size="18.667px"
+         id="tspan259">START</tspan></text>
+    <text
+       x="725"
+       y="506.99991"
+       font-size="40px"
+       letter-spacing="0px"
+       text-align="center"
+       style="line-height:1.25"
+       xml:space="preserve"
+       id="text260"><tspan
+         x="724.5"
+         y="506.99991"
+         font-size="18.667px"
+         letter-spacing="-1px"
+         id="tspan260">HOME</tspan></text>
+    <g
+       font-size="13.333px"
+       letter-spacing="15px"
+       id="g268">
+      <text
+         transform="scale(-1)"
+         x="-707.5"
+         y="-820.00018"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text261"><tspan
+           x="-700"
+           y="-820.00018"
+           id="tspan261">SLIDE</tspan></text>
+      <text
+         transform="scale(-1)"
+         x="-282.5"
+         y="-820.00018"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text262"><tspan
+           x="-275"
+           y="-820.00018"
+           id="tspan262">SLIDE</tspan></text>
+      <text
+         transform="rotate(-90)"
+         x="-707.5"
+         y="79.999794"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text263"><tspan
+           x="-700"
+           y="79.999794"
+           id="tspan263">SLIDE</tspan></text>
+      <text
+         transform="rotate(-90)"
+         x="-282.5"
+         y="79.999794"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text264"><tspan
+           x="-275"
+           y="79.999794"
+           id="tspan264">SLIDE</tspan></text>
+      <text
+         x="192.5"
+         y="80.000221"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text265"><tspan
+           x="200"
+           y="80.000221"
+           id="tspan265">SLIDE</tspan></text>
+      <text
+         x="617.5"
+         y="80.000221"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text266"><tspan
+           x="625"
+           y="80.000221"
+           id="tspan266">SLIDE</tspan></text>
+      <text
+         transform="rotate(90)"
+         x="192.5"
+         y="-819.99976"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text267"><tspan
+           x="200"
+           y="-819.99976"
+           id="tspan267">SLIDE</tspan></text>
+      <text
+         transform="rotate(90)"
+         x="617.5"
+         y="-819.99976"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text268"><tspan
+           x="625"
+           y="-819.99976"
+           id="tspan268">SLIDE</tspan></text>
+    </g>
+    <g
+       font-size="40px"
+       letter-spacing="0px"
+       id="g274">
+      <text
+         transform="rotate(90)"
+         x="625"
+         y="-143.00009"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text269"><tspan
+           x="625"
+           y="-143.00009"
+           font-size="18.667px"
+           id="tspan269">START</tspan></text>
+      <text
+         transform="rotate(90)"
+         x="725.5"
+         y="-393.00009"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text270"><tspan
+           x="725"
+           y="-393.00009"
+           font-size="18.667px"
+           letter-spacing="-1px"
+           id="tspan270">HOME</tspan></text>
+      <text
+         transform="scale(-1)"
+         x="-275"
+         y="-142.99983"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text271"><tspan
+           x="-275"
+           y="-142.99983"
+           font-size="18.667px"
+           id="tspan271">START</tspan></text>
+      <text
+         transform="scale(-1)"
+         x="-174.5"
+         y="-392.99985"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text272"><tspan
+           x="-175"
+           y="-392.99985"
+           font-size="18.667px"
+           letter-spacing="-1px"
+           id="tspan272">HOME</tspan></text>
+      <text
+         transform="rotate(-90)"
+         x="-275"
+         y="757.00018"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text273"><tspan
+           x="-275"
+           y="757.00018"
+           font-size="18.667px"
+           id="tspan273">START</tspan></text>
+      <text
+         transform="rotate(-90)"
+         x="-174.5"
+         y="507.00015"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text274"><tspan
+           x="-175"
+           y="507.00015"
+           font-size="18.667px"
+           letter-spacing="-1px"
+           id="tspan274">HOME</tspan></text>
+    </g>
+    <g
+       font-size="16px"
+       letter-spacing="7px"
+       id="g278">
+      <text
+         transform="rotate(-90)"
+         x="-678.5"
+         y="731"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text275"><tspan
+           x="-675"
+           y="731"
+           id="tspan275">SAFETY ZONE</tspan></text>
+      <text
+         x="221.5"
+         y="730.99982"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text276"><tspan
+           x="225"
+           y="730.99982"
+           id="tspan276">SAFETY ZONE</tspan></text>
+      <text
+         transform="rotate(90)"
+         x="221.5"
+         y="-169.00018"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text277"><tspan
+           x="225"
+           y="-169.00018"
+           id="tspan277">SAFETY ZONE</tspan></text>
+      <text
+         transform="scale(-1)"
+         x="-678.5"
+         y="-169"
+         text-align="center"
+         style="line-height:1.25"
+         xml:space="preserve"
+         id="text278"><tspan
+           x="-675"
+           y="-169"
+           id="tspan278">SAFETY ZONE</tspan></text>
+    </g>
+  </g>
+  <rect
+     style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+     id="rect279"
+     width="150"
+     height="100"
+     x="375"
+     y="325" />
+  <text
+     xml:space="preserve"
+     style="font-size:16px;line-height:1.1;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:2px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:none;stroke:#000000;stroke-width:0;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+     x="-450.92206"
+     y="-387.7301"
+     id="text279"
+     transform="scale(-1)"><tspan
+       sodipodi:role="line"
+       id="tspan279"
+       x="-450.92206"
+       y="-387.7301"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0.01px;fill:#000000;fill-opacity:1">PLACE PACK</tspan><tspan
+       sodipodi:role="line"
+       x="-450.92206"
+       y="-368.72922"
+       id="tspan280"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:2px;fill:#000000;fill-opacity:1">FACE DOWN</tspan><tspan
+       sodipodi:role="line"
+       x="-449.92206"
+       y="-346.47827"
+       id="tspan281"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:2px;fill:#000000;fill-opacity:1">HERE</tspan></text>
+  <rect
+     style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+     id="rect279-0"
+     width="150"
+     height="100"
+     x="375"
+     y="475" />
+  <text
+     xml:space="preserve"
+     style="font-size:16px;line-height:1.1;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;letter-spacing:2px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:none;stroke:#000000;stroke-width:0;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+     x="449.07791"
+     y="512.2699"
+     id="text279-9"><tspan
+       sodipodi:role="line"
+       id="tspan279-4"
+       x="449.07791"
+       y="512.2699"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0.01px;fill:#000000;fill-opacity:1">DISCARD</tspan><tspan
+       sodipodi:role="line"
+       x="449.07791"
+       y="531.27081"
+       id="tspan280-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:2px;fill:#000000;fill-opacity:1">FACE UP</tspan><tspan
+       sodipodi:role="line"
+       x="450.07791"
+       y="553.52173"
+       id="tspan281-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.3333px;line-height:1.1;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:2px;fill:#000000;fill-opacity:1">HERE</tspan></text>
+</svg>

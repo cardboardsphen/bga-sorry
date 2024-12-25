@@ -1,0 +1,176 @@
+/**
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * Sorry implementation : © cardboardsphen, bga-dev@sphen.com
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * sorry.css
+ *
+ * Sorry stylesheet
+ *
+ */
+
+// Note: you must not use any @import directive
+
+//********* You can start writing your CSS below this line: **********/
+
+
+#board {
+    position: relative;
+    width: 900px;
+    height: 900px;
+    background-image: url("img/board.png");
+}
+
+.square {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+}
+.circle {
+    position: absolute;
+    width: 97px;
+    height: 97px;
+    border-radius: 50%;
+}
+
+#start-red { left: 226px; top: 101px; }
+#start-blue { left: 701px; top: 226px; }
+#start-yellow { left: 576px; top: 701px; }
+#start-green { left: 101px; top: 576px; }
+#home-red { left: 126px; top: 351px; }
+#home-blue { left: 451px; top: 126px; }
+#home-yellow { left: 676px; top: 451px; }
+#home-green { left: 351px; top: 676px; }
+
+@keyframes outline-pulse {
+    0% { outline-color: orangered; }
+    90% { outline-color: orangered; }
+    100% { outline-color: orange; }
+}
+.possible-move {
+    z-index: 1;
+    outline-width: 5px;
+    outline-style:  dashed;
+    cursor: pointer;
+    animation: outline-pulse 4s linear infinite alternate;
+}
+
+.pawn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: absolute;
+    background-image: url('img/pawns.png');
+
+    &[data-color="red"] { background-position: 0% 0%; }
+    &[data-color="blue"] { background-position: 100% 0%; }
+    &[data-color="yellow"] { background-position: 100% 100%; }
+    &[data-color="green"] { background-position: 0% 100%; }
+}
+
+.card-pile {
+    position: absolute;
+    width: 150px;
+    height: 100px;
+}
+
+#draw-pile { left: 375px; top: 325px; }
+#discard-pile { left: 375px; top: 475px; }
+
+.card {
+    width: 96px;
+    height: 146px;
+    position: absolute;
+    background-image: url('img/cards.png');
+
+    .card-pile & {
+        left: 2px;
+        top: 98px;
+        transform: rotate(-90deg);
+        transform-origin: top left;
+    }
+
+    &.hidden {
+        visibility: hidden;
+        display: block;
+    }
+
+    &[data-rank="back"] { background-position: 0% 0%; }
+    &[data-rank="1"] { background-position: -100% 0%; }
+    &[data-rank="2"] { background-position: -200% 0%; }
+    &[data-rank="3"] { background-position: -300% 0%; }
+    &[data-rank="4"] { background-position: 0% -100%; }
+    &[data-rank="5"] { background-position: -100% -100%; }
+    &[data-rank="7"] { background-position: -200% -100%; }
+    &[data-rank="8"] { background-position: -300% -100%; }
+    &[data-rank="10"] { background-position: 0% -200%; }
+    &[data-rank="11"] { background-position: -100% -200%; }
+    &[data-rank="12"] { background-position: -200% -200%; }
+    &[data-rank="sorry"] { background-position: -300% -200%; }
+}
+
+@keyframes reveal-card {
+    0% { transform: rotate(-90deg); }
+    30% { transform: scale(1.4) translate3d(-10px, 10px, 50px) rotate(-90deg); }
+    65% { transform: scale(1.6) translate3d(15px, -35px, 75px) rotate(-45deg); }
+    100% { transform: scale(1.8) translate3d(45px, -58px, 100px); }
+}
+@keyframes reveal-card-front {
+    0% { transform: rotateY(180deg); }
+    30% { transform: rotateY(180deg); }
+    65% { transform: rotateY(90deg); }
+    100% { transform: none; }
+}
+@keyframes reveal-card-back {
+    0% { transform: none; }
+    30% { transform: none; }
+    65% { transform: rotateY(-90deg); }
+    100% { transform: rotateY(-180deg); }
+}
+
+@keyframes  discard-card {
+    0% { transform: scale(1.8) translate3d(45px, -58px, 100px); }
+    100% { transform: translate3d(0, 150px, 0) rotate(-90deg); }
+}
+
+#reveal-card {
+    // default is at the draw pile
+#draw-pile { left: 375px; top: 325px; }
+#discard-pile { left: 375px; top: 475px; }
+    left: 377px;
+    top: 423px;
+    width: 96px;
+    height: 146px;
+    position: absolute;
+    transform: rotate(-90deg);
+    transform-origin: top left;
+
+    .card {
+        backface-visibility: hidden;
+
+        &.front { transform: rotateY(180deg); }
+    }
+
+    &.revealing {
+        animation: reveal-card 3s linear forwards;
+
+        .front { animation: reveal-card-front 3s linear forwards; }
+        .back { animation: reveal-card-back 3s linear forwards; }
+    }
+    &.revealed {
+        transform: scale(1.8) translate3d(45px, -58px, 100px);
+
+        .front { transform: none; }
+        .back { transform: rotateY(-180deg); }
+    }
+    &.discarding {
+        animation: discard-card 2s linear forwards;
+
+        .front { transform: none; }
+        .back { transform: rotateY(-180deg); }
+    }
+}
