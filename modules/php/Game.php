@@ -20,10 +20,9 @@ declare(strict_types=1);
 
 namespace Bga\Games\Sorry;
 
-use BgaVisibleSystemException;
-use Exception;
-use stdClass;
-
+use Bga\Games\Sorry\{Pawn, Move};
+use Bga\Games\Sorry\Board\{BoardLocation, BoardSection, BoardColor};
+use BgaUserException;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 require_once('databasehelpers.inc.php');
@@ -138,7 +137,7 @@ class Game extends \Table {
         );
         $this->notifyAllPlayers('simplePause', '', ['time' => 1500]);
 
-        $possibleMoves = $this->getAllPossibleMoves();
+        $possibleMoves = $this->determineAllPossibleMoves();
 
         if ($possibleMoves) {
             $this->gamestate->nextState("selectPawn");
@@ -162,13 +161,24 @@ class Game extends \Table {
         $rank = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
         $possibleMoves = $this->getAllPossibleMoves();
 
+        if ($pawnId < 0) {
+            $noRequiredMoves = $rank == '11';
+            foreach ($possibleMoves as $moves) {
+                foreach ($moves as $move) {
+                    $noRequiredMoves &= false;
+                }
+            }
+            if (!$noRequiredMoves)
+                throw new BgaUserException("$player has valid moves and can not skip right now.");
+        }
+
         if (!array_key_exists($pawnId, $possibleMoves) || count($possibleMoves[$pawnId]) == 0)
-            throw new BgaVisibleSystemException("$player can not move that pawn right now.");
+            throw new BgaUserException("$player can not move that pawn right now.");
 
         if (count($possibleMoves[$pawnId]) == 1) {
             $this->movePawn($pawnId, $possibleMoves[$pawnId][0]);
             $this->discardCard();
-            $this->gamestate->nextState('nextPlayer');
+            $this->gamestate->nextState('movePawn');
             return;
         }
 
@@ -400,20 +410,26 @@ class Game extends \Table {
         $this->notifyAllPlayers('simplePause', '', ['time' => 3000]);
     }
 
-    private function getAllPossibleMoves(): array {
+    private function determineAllPossibleMoves(): void {
+        $this->DbQuery("DELETE from possible_moves");
+
         $playerId = (int)$this->getActivePlayerId();
-        $playerColor = self::getFirstRowFromDb("SELECT player_color_name as color from player where player_id = '$playerId'")->color;
         $card = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
         $pawns = self::getRowsFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where player = '$playerId'");
 
-        $possibleMoves = [];
+        $sql = "INSERT into possible_moves (player, pawn_id, destination_section, destination_section_color, destination_section_index, optional, number_of_steps) values ";
+        $sqlRows = [];
         foreach ($pawns as $pawn) {
-            $moves = $this->getPossibleMoves($pawn, $card);
-            if ($moves)
-                $possibleMoves[(int)$pawn->id] = $moves;
+            $moves = $this->getPossibleMoves(Pawn::fromDb($pawn), $card);
+            foreach ($moves as $move) {
+                $sqlRows[] = "('$playerId', '$pawn->id', '{$move->destination->section}', '{$move->destination->color}', '{$move->destination->index}', '$move->isOptional', '$move->numberOfSteps')";
+            }
         }
+        $this->DbQuery($sql . implode(',', $sqlRows));
 
         if ($card == 7) {
+            $pawns = $this->getRowsFromDb();
+            $possibleMoves = $this->getRowsFromDb("SELECT player, pawn_id, number_of_steps from possible_moves where player = '$playerId'");
             $this->dump('$possibleMoves', $possibleMoves);
             foreach ($possibleMoves as $pawnId => $moves) {
                 foreach (array_keys($moves) as $numSteps) {
@@ -432,24 +448,26 @@ class Game extends \Table {
                         unset($moves[$numSteps]);
                 }
             }
-            $this->dump('$possibleMoves', $possibleMoves);
         }
-        return $possibleMoves;
     }
 
-    private function getPossibleMoves(stdClass $pawn, string $card): array {
+    /**
+     * @return Move[]
+     */
+    private function getPossibleMoves(Pawn $pawn, string $card): array {
         $cardVal = (int)$card;
 
-        if ($pawn->boardSection == 'home')
+        if ($pawn->location->section === BoardSection::home)
             return [];
 
-        if ($pawn->boardSection == 'start') {
-            if (in_array($cardVal, [1, 2]) && $this->pawnCanMoveToLocation($pawn->color, $this->determineDestination($pawn, 0)))
-                return [['margin', $pawn->boardSectionColor, 4]];
+        if ($pawn->location->section === BoardSection::start) {
+            $destination = BoardLocation::fromPawnMove($pawn, 1);
+            if (in_array($cardVal, [1, 2]) && $this->pawnCanMoveToLocation($pawn, $destination))
+                return Move::create($pawn, $destination, 1);
 
             if ($card == 'sorry') {
-                $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->player} and board_section = 'margin'");
-                return $this->pawnsToLocations($otherPlayerPawnsOnMargin);
+                $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->playerId} and board_section = 'margin'");
+                return array_map(fn($otherPawn) => Move::create($pawn, $otherPawn->location), $otherPlayerPawnsOnMargin);
             }
 
             return [];
@@ -459,155 +477,64 @@ class Game extends \Table {
         if ($card == 'sorry')
             return [];
 
-        if (in_array($cardVal, [1, 2, 3, 4, 5, 8, 12])) {
+        if (in_array($cardVal, [1, 2, 3, 4, 5, 8, 10, 12])) {
             if ($cardVal == 4)
                 $cardVal = -4;
 
-            $destination = $this->determineDestination($pawn, $cardVal);
-            return $this->pawnCanMoveToLocation($pawn->color, $destination)
-                ? [$destination]
-                : [];
+            $possibleMoves = [];
+            $this->addMoveIfPossible($possibleMoves, $pawn, $cardVal);
+
+            if ($cardVal == 10)
+                $this->addMoveIfPossible($possibleMoves, $pawn, -1);
+
+            return $possibleMoves;
         }
 
         if ($cardVal == 7) {
             $possibleMoves = [];
-            for ($i = 1; $i <= 7; $i++) {
-                $destination = $this->determineDestination($pawn, $i);
-                if ($this->pawnCanMoveToLocation($pawn->color, $destination))
-                    $possibleMoves[$i] = $destination;
-            }
-            return $possibleMoves;
-        }
-
-        if ($cardVal == 10) {
-            $possibleMoves = [$this->determineDestination($pawn, -1)];
-
-            $destination = $this->determineDestination($pawn, 10);
-            if ($destination)
-                $possibleMoves[] = $destination;
-
+            for ($i = 1; $i <= 7; $i++)
+                $this->addMoveIfPossible($possibleMoves, $pawn, $i);
             return $possibleMoves;
         }
 
         if ($cardVal == 11) {
             $possibleMoves = [];
 
-            if ($pawn->boardSection == 'margin') {
-                $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->player} and board_section = 'margin'");
-                $possibleMoves = array_merge($possibleMoves, $this->pawnsToLocations($otherPlayerPawnsOnMargin));
+            if ($pawn->location->section === BoardSection::margin) {
+                $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->playerId} and board_section = 'margin'");
+                $swapMoves = array_map(fn($otherPawn) => Move::create($pawn, $otherPawn->location, isOptional: true), $otherPlayerPawnsOnMargin);
+                $possibleMoves = array_merge($possibleMoves, $swapMoves);
             }
 
-            $destination = $this->determineDestination($pawn, $cardVal);
-            if ($this->pawnCanMoveToLocation($pawn->color, $destination))
-                $possibleMoves[] = $destination;
-
+            $this->addMoveIfPossible($possibleMoves, $pawn, 11);
             return $possibleMoves;
         }
 
         return [];
     }
 
-    private function pawnCanMoveToLocation(string $pawnColor, array $location): bool {
-        if (!$location)
+    private function addMoveIfPossible(array &$possibleMoves, Pawn $pawn, int $numSteps): void {
+        $destination = BoardLocation::fromPawnMove($pawn, $numSteps);
+        if ($this->pawnCanMoveToLocation($pawn, $destination, $numSteps))
+            $possibleMoves[] = $destination;
+    }
+
+    private function pawnCanMoveToLocation(Pawn $pawn, BoardLocation $location): bool {
+        if (is_null($location))
             return false;
 
-        [$section, $sectionColor, $index] = $location;
-        if ($section == 'start')
+        if ($location->section === BoardSection::start)
             return false;
 
-        if ($section == 'home')
+        if ($location->section === BoardSection::home)
             return true;
 
-        $sameColorPawnsAtLocation = self::getRowsFromDb("SELECT id from pawns where color = '$pawnColor' and board_section = '$section' and board_section_color = '$sectionColor' and board_section_index = '$index'");
+        $sameColorPawnsAtLocation = self::getRowsFromDb("SELECT id from pawns where color = '$pawn->color' and board_section = '$location->section' and board_section_color = '$location->color' and board_section_index = '$location->index'");
         return count($sameColorPawnsAtLocation) == 0;
     }
 
-    private function pawnsToLocations(array $pawns): array {
-        return array_map([$this, 'pawnToLocation'], $pawns);
-    }
-
-    private function pawnToLocation(stdClass $pawn): array {
-        return [$pawn->boardSection, $pawn->boardSectionColor, (int)$pawn->boardSectionIndex];
-    }
-
-    private function determineDestination(stdClass $pawn, $numberOfMoves): array {
-        $currentLocation = $this->pawnToLocation($pawn);
-        [$currentSection, $currentColor, $currentIndex] = $currentLocation;
-
-        return $this->simplifyLocation($pawn->color, [$currentSection, $currentColor, $currentIndex + $numberOfMoves]);
-    }
-
-    // returns null if the location is outside of the board (i.e.: beyond the home space)
-    private function simplifyLocation(string $pawnColor, array $location): array {
-        [$section, $color, $index] = $location;
-        if ($section == 'home')
-            throw new BgaVisibleSystemException("can not start at home");
-
-        if ($section == 'start')
-            return ['margin', $color, 4];
-
-        if (is_null($index))
-            throw new BgaVisibleSystemException("starting location must have an index");
-
-        if ($section == 'safety') {
-            if ($index < 0)
-                return $this->simplifyLocation($pawnColor, ['margin', $color, $index + 3]);
-
-            if ($index < 5)
-                return [$section, $color, $index];
-
-            if ($index == 5)
-                return ['home', $color, $index];
-
-            // $index > 5
-            return [];
-        }
-
-        if ($section == 'margin') {
-            if ($index < 0)
-                return $this->simplifyLocation($pawnColor, ['margin', $this->getPreviousColor($color), $index + 15]);
-
-            if ($index < 3 && $color == $pawnColor)
-                return $this->simplifyLocation($pawnColor, ['safety', $color, $index - 3]);
-
-            if ($index < 15)
-                return [$section, $color, $index];
-
-            // $index >= 15 && $color != $pawnColor
-            return $this->simplifyLocation($pawnColor, ['margin', $this->getNextColor($color), $index - 15]);
-        }
-
-        throw new BgaVisibleSystemException("starting location '$section' is not valid");
-    }
-
-    private function getNextColor(string $color): string {
-        switch ($color) {
-            case 'red':
-                return 'blue';
-            case 'blue':
-                return 'yellow';
-            case 'yellow':
-                return 'green';
-            case 'green':
-                return 'red';
-            default:
-                throw new BgaVisibleSystemException("invalid color: '$color'");
-        }
-    }
-
-    private function getPreviousColor(string $color): string {
-        switch ($color) {
-            case 'red':
-                return 'green';
-            case 'green':
-                return 'yellow';
-            case 'yellow':
-                return 'blue';
-            case 'blue':
-                return 'red';
-            default:
-                throw new BgaVisibleSystemException("invalid color: '$color'");
-        }
+    private function movePawn(int $pawnId, array $location): void {
+        [$section, $sectionColor, $sectionIndex] = $location;
     }
 
     private function getWinner(): int {
