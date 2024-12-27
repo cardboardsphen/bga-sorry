@@ -45,13 +45,4 @@ trait EnumFromName {
 
         return $output;
     }
-
-    /**
-     * Returns the name of the enum value.
-     *
-     * @return string The name of the enum value.
-     */
-    public function __toString(): string {
-        return $this->name;
-    }
 }

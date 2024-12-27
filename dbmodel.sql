@@ -45,6 +45,7 @@ create table if not exists possible_moves (
     destination_section_color enum('red', 'blue', 'yellow', 'green') not null,
     destination_section_index smallint unsigned not null,
     optional boolean not null,
+    number_of_steps smallint unsigned not null,
     selected boolean not null default false,
     foreign key (player, pawn_id)
         references pawns (player, id)

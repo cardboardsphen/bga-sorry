@@ -65,7 +65,7 @@ class BoardLocation {
         $destination = clone $pawn->location;
         $destination->index += $steps;
         try {
-            $destination->simplifyLocation(BoardColor::fromName($pawn->color));
+            $destination->simplifyLocation($pawn->color);
         } catch (OutOfRangeException $e) {
             return null;
         }
