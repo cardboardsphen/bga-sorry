@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\Sorry;
+namespace Bga\Games\Sorry\Models;
 
-use Bga\Games\Sorry\Board\BoardLocation;
+use Bga\Games\Sorry\Models\Board\BoardLocation;
 
 class Move {
     /**

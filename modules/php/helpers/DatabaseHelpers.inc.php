@@ -1,6 +1,6 @@
 <?php
 
-namespace Bga\Games\Sorry;
+namespace Bga\Games\Sorry\Helpers;
 
 trait DatabaseHelpers {
     /**

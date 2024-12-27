@@ -20,12 +20,13 @@ declare(strict_types=1);
 
 namespace Bga\Games\Sorry;
 
-use Bga\Games\Sorry\{Pawn, Move};
-use Bga\Games\Sorry\Board\{BoardLocation, BoardSection, BoardColor};
-use BgaUserException;
-
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
-require_once('databasehelpers.inc.php');
+require_once("autoload.php");
+
+use Bga\Games\Sorry\Helpers\DatabaseHelpers;
+use Bga\Games\Sorry\Models\{Pawn, Move};
+use Bga\Games\Sorry\Models\Board\{BoardLocation, BoardSection, BoardColor};
+use BgaUserException;
 
 class Game extends \Table {
     use DatabaseHelpers;

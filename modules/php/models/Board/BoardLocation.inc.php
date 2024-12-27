@@ -1,10 +1,10 @@
 <?php
 
-declare(scrict_types=1);
+declare(strict_types=1);
 
-namespace Bga\Games\Sorry\Board;
+namespace Bga\Games\Sorry\Models\Board;
 
-use Bga\Games\Sorry\Pawn;
+use Bga\Games\Sorry\Models\Pawn;
 
 use BgaVisibleSystemException;
 use OutOfRangeException;
@@ -105,7 +105,7 @@ class BoardLocation {
             throw new OutOfRangeException("past the home space");
         }
 
-        if ($this->section === 'margin') {
+        if ($this->section === BoardSection::margin) {
             if ($this->index < 0) {
                 $this->color = $this->color->getPreviousColor();
                 $this->index += 15;

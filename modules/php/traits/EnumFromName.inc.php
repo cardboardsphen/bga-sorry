@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\Sorry;
+namespace Bga\Games\Sorry\Traits;
 
 use BgaVisibleSystemException;
 
@@ -44,5 +44,14 @@ trait EnumFromName {
             throw new BgaVisibleSystemException("$name is not a valid  " . self::class);
 
         return $output;
+    }
+
+    /**
+     * Returns the name of the enum value.
+     *
+     * @return string The name of the enum value.
+     */
+    public function __toString(): string {
+        return $this->name;
     }
 }

@@ -50,7 +50,7 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
-require_once("modules/php/constants.inc.php");
+require_once("modules/php/Constants.inc.php");
 
 $machinestates = [
     // The initial state. Please do not modify.

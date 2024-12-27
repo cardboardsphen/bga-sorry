@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\Sorry\Board;
+namespace Bga\Games\Sorry\Models\Board;
 
-use Bga\Games\Sorry\EnumFromName;
+use Bga\Games\Sorry\Traits\EnumFromName;
 
 /**
  * Represents a section of the board.
