@@ -65,7 +65,7 @@ class Game extends \Table {
      * @see ./states.inc.php
      */
     public function argDrawCard(): array {
-        $playerId = (int)$this->getActivePlayerId();
+        $playerId = intval($this->getActivePlayerId());
         $playerColor = self::getFirstRowFromDb("SELECT player_color_name as color from player where player_id = '$playerId'")->color;
         return [
             'color' => $playerColor,
@@ -73,10 +73,10 @@ class Game extends \Table {
     }
 
     public function argSelectPawn(): array {
-        $playerId = (int)$this->getActivePlayerId();
+        $playerId = intval($this->getActivePlayerId());
         $playerColor = self::getFirstRowFromDb("SELECT player_color_name as color from player where player_id = '$playerId'")->color;
         $rank = self::getFirstRowFromDb("SELECT id, rank from cards where pile = 'discard' order by position desc limit 1")->rank;
-        $possibleMoves = $this->getAllPossibleMoves();
+        $possibleMoves = [];
         $canSkip = true;
         return [
             'player' => $playerId,
@@ -138,7 +138,8 @@ class Game extends \Table {
         );
         $this->notifyAllPlayers('simplePause', '', ['time' => 1500]);
 
-        $possibleMoves = $this->determineAllPossibleMoves();
+        $this->determineAllPossibleMoves();
+        $possibleMoves = [];
 
         if ($possibleMoves) {
             $this->gamestate->nextState("selectPawn");
@@ -160,7 +161,7 @@ class Game extends \Table {
     public function actSelectPawn(int $pawnId) {
         $player = $this->getActivePlayerName();
         $rank = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
-        $possibleMoves = $this->getAllPossibleMoves();
+        $possibleMoves = [];
 
         if ($pawnId < 0) {
             $noRequiredMoves = $rank == '11';
@@ -170,11 +171,11 @@ class Game extends \Table {
                 }
             }
             if (!$noRequiredMoves)
-                throw new BgaUserException("$player has valid moves and can not skip right now.");
+                throw new BgaUserException($this->_("$player has valid moves and can not skip right now."));
         }
 
         if (!array_key_exists($pawnId, $possibleMoves) || count($possibleMoves[$pawnId]) == 0)
-            throw new BgaUserException("$player can not move that pawn right now.");
+            throw new BgaUserException($this->_("$player can not move that pawn right now."));
 
         if (count($possibleMoves[$pawnId]) == 1) {
             $this->movePawn($pawnId, $possibleMoves[$pawnId][0]);
@@ -213,7 +214,7 @@ class Game extends \Table {
             return;
         }
 
-        $playerId = (int)$this->getActivePlayerId();
+        $playerId = intval($this->getActivePlayerId());
         $this->giveExtraTime($playerId);
         $this->activeNextPlayer();
         $this->gamestate->nextState('nextTurn');
@@ -278,7 +279,7 @@ class Game extends \Table {
         $result = [];
 
         // WARNING: We must only return information visible by the current player.
-        $currentPlayerId = (int) $this->getCurrentPlayerId();
+        $currentPlayerId = intval($this->getCurrentPlayerId());
 
         // Get information about players.
         // NOTE: you can retrieve some extra field you added for "player" table in `dbmodel.sql` if you need it.
@@ -414,7 +415,7 @@ class Game extends \Table {
     private function determineAllPossibleMoves(): void {
         $this->DbQuery("DELETE from possible_moves");
 
-        $playerId = (int)$this->getActivePlayerId();
+        $playerId = intval($this->getActivePlayerId());
         $card = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
         $pawns = self::getRowsFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where player = '$playerId'");
 
@@ -422,33 +423,38 @@ class Game extends \Table {
         $sqlRows = [];
         foreach ($pawns as $pawn) {
             $moves = $this->getPossibleMoves(Pawn::fromDb($pawn), $card);
-            foreach ($moves as $move) {
-                $sqlRows[] = "('$playerId', '$pawn->id', '{$move->destination->section}', '{$move->destination->color}', '{$move->destination->index}', '$move->isOptional', '$move->numberOfSteps')";
-            }
+            foreach ($moves as $move)
+                $sqlRows[] = "('$playerId', '$pawn->id', '{$move->destination->section->name}', '{$move->destination->color->name}', '{$move->destination->index}', '" . ($move->isOptional ? 1 : 0) . "', '$move->numberOfSteps')";
         }
-        $this->DbQuery($sql . implode(',', $sqlRows));
+        if (count($sqlRows) > 0)
+            $this->DbQuery($sql . implode(',', $sqlRows));
 
         if ($card == 7) {
-            $pawns = $this->getRowsFromDb();
-            $possibleMoves = $this->getRowsFromDb("SELECT player, pawn_id, number_of_steps from possible_moves where player = '$playerId'");
-            $this->dump('$possibleMoves', $possibleMoves);
-            foreach ($possibleMoves as $pawnId => $moves) {
-                foreach (array_keys($moves) as $numSteps) {
-                    $found_7sAddendPair = false;
-                    foreach ($possibleMoves as $otherPawnId => $otherMoves) {
-                        if ($otherPawnId == $pawnId)
-                            continue;
-
-                        foreach (array_keys($otherMoves) as $numOtherSteps) {
-                            if ($numSteps + $numOtherSteps == 7)
-                                $found_7sAddendPair = true;
-                        }
-                    }
-
-                    if (!$found_7sAddendPair)
-                        unset($moves[$numSteps]);
-                }
+            $pawns = $this->getRowsFromDb("SELECT distinct pawn_id from possible_moves where player = '$playerId'");
+            $this->dump('$pawns', $pawns);
+            foreach ($pawns as $pawn) {
+                $possibleMoves = $this->getRowsFromDb("SELECT id, number_of_steps from possible_moves where player = '$playerId' and pawn_id = '$pawn->pawnId'");
+                $otherPawnsPossibleMoves = $this->getRowsFromDb("SELECT number_of_steps from possible_moves where player = '$playerId' and pawn_id != '$pawn->pawnId'");
+                $this->dump('$possibleMoves', $possibleMoves);
+                $this->dump('$otherPawnsPossibleMoves', $otherPawnsPossibleMoves);
             }
+            //            foreach ($possibleMoves as $pawnId => $moves) {
+            //                foreach (array_keys($moves) as $numSteps) {
+            //                    $found_7sAddendPair = false;
+            //                    foreach ($possibleMoves as $otherPawnId => $otherMoves) {
+            //                        if ($otherPawnId == $pawnId)
+            //                            continue;
+            //
+            //                        foreach (array_keys($otherMoves) as $numOtherSteps) {
+            //                            if ($numSteps + $numOtherSteps == 7)
+            //                                $found_7sAddendPair = true;
+            //                        }
+            //                    }
+            //
+            //                    if (!$found_7sAddendPair)
+            //                        unset($moves[$numSteps]);
+            //                }
+            //            }
         }
     }
 
@@ -456,7 +462,8 @@ class Game extends \Table {
      * @return Move[]
      */
     private function getPossibleMoves(Pawn $pawn, string $card): array {
-        $cardVal = (int)$card;
+        $cardVal = intval($card);
+        $this->debug("moves for #$pawn->id, $card");
 
         if ($pawn->location->section === BoardSection::home)
             return [];
@@ -464,11 +471,11 @@ class Game extends \Table {
         if ($pawn->location->section === BoardSection::start) {
             $destination = BoardLocation::fromPawnMove($pawn, 1);
             if (in_array($cardVal, [1, 2]) && $this->pawnCanMoveToLocation($pawn, $destination))
-                return Move::create($pawn, $destination, 1);
+                return [Move::create($pawn, $destination, 1)];
 
             if ($card == 'sorry') {
                 $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->playerId} and board_section = 'margin'");
-                return array_map(fn($otherPawn) => Move::create($pawn, $otherPawn->location), $otherPlayerPawnsOnMargin);
+                return array_map(fn($otherPawn) => Move::create($pawn, Pawn::fromDb($otherPawn)->location), $otherPlayerPawnsOnMargin);
             }
 
             return [];
@@ -492,6 +499,7 @@ class Game extends \Table {
         }
 
         if ($cardVal == 7) {
+            $this->debug("card is 7");
             $possibleMoves = [];
             for ($i = 1; $i <= 7; $i++)
                 $this->addMoveIfPossible($possibleMoves, $pawn, $i);
@@ -514,13 +522,18 @@ class Game extends \Table {
         return [];
     }
 
+    /**
+     * @param Move[] $possibleMoves
+     */
     private function addMoveIfPossible(array &$possibleMoves, Pawn $pawn, int $numSteps): void {
         $destination = BoardLocation::fromPawnMove($pawn, $numSteps);
+        $this->dump("trying to move to", $destination);
         if ($this->pawnCanMoveToLocation($pawn, $destination, $numSteps))
-            $possibleMoves[] = $destination;
+            $possibleMoves[] = Move::create($pawn, $destination, $numSteps);
     }
 
-    private function pawnCanMoveToLocation(Pawn $pawn, BoardLocation $location): bool {
+    private function pawnCanMoveToLocation(Pawn $pawn, ?BoardLocation $location): bool {
+        $this->dump('$location', $location);
         if (is_null($location))
             return false;
 
@@ -530,7 +543,8 @@ class Game extends \Table {
         if ($location->section === BoardSection::home)
             return true;
 
-        $sameColorPawnsAtLocation = self::getRowsFromDb("SELECT id from pawns where color = '$pawn->color' and board_section = '$location->section' and board_section_color = '$location->color' and board_section_index = '$location->index'");
+        $sameColorPawnsAtLocation = self::getRowsFromDb("SELECT id from pawns where color = '{$pawn->color->name}' and board_section = '{$location->section->name}' and board_section_color = '{$location->color->name}' and board_section_index = '$location->index'");
+        $this->dump('$sameColorPawnsAtLocation', $sameColorPawnsAtLocation);
         return count($sameColorPawnsAtLocation) == 0;
     }
 
@@ -543,7 +557,7 @@ class Game extends \Table {
         foreach ($players as $player) {
             $pawns = self::getRowsFromDb("SELECT board_section, board_section_color from pawns where player = '{$player->id}' and board_section = 'home'");
             if (count($pawns) == 4)
-                return (int)$player->id;
+                return intval($player->id);
         }
         return -1;
     }
