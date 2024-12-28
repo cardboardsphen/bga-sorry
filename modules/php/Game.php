@@ -300,6 +300,8 @@ class Game extends \Table {
             ? (property_exists($topDiscards[1], "rank") ? $topDiscards[1]->rank : null)
             : null;
 
+        $result['version'] = $this->getGameStateValue('game_db_version');
+
         return $result;
     }
 

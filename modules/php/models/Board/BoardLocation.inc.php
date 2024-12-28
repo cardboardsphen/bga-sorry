@@ -63,20 +63,22 @@ class BoardLocation {
      */
     public static function fromPawnMove(Pawn $pawn, int $steps): ?BoardLocation {
         $destination = clone $pawn->location;
-        $destination->index += $steps;
         try {
-            $destination->simplifyLocation($pawn->color);
+            $destination->moveSteps($pawn->color, $steps);
+            return $destination;
         } catch (OutOfRangeException $e) {
             return null;
         }
-        return $destination;
     }
 
-    private function simplifyLocation(BoardColor $pawnColor): void {
+    private function moveSteps(BoardColor $pawnColor, int $steps): void {
         if ($this->section === BoardSection::home)
             throw new BgaVisibleSystemException("can not start at home");
 
         if ($this->section === BoardSection::start) {
+            if ($steps <= 0)
+                return;
+
             $this->section = BoardSection::margin;
             $this->index = 4;
             return;
@@ -86,46 +88,66 @@ class BoardLocation {
             throw new BgaVisibleSystemException("starting location must have an index");
 
         if ($this->section === BoardSection::safety) {
-            if ($this->index < 0) {
-                $this->section = BoardSection::margin;
-                $this->index += 3;
-                $this->simplifyLocation($pawnColor);
-                return;
-            }
+            $newIndex = $this->index + $steps;
+            if ($newIndex > 5)
+                throw new OutOfRangeException("past the safety space");
 
-            if ($this->index < 5)
-                return;
-
-            if ($this->index == 5) {
+            if ($newIndex == 5) {
                 $this->section = BoardSection::home;
+                $this->index = null;
                 return;
             }
 
-            // $index > 5
-            throw new OutOfRangeException("past the home space");
+            if ($newIndex >= 0) {
+                $this->index = $newIndex;
+                return;
+            }
+
+            // moving out backwards
+            $this->section = BoardSection::margin;
+            $newIndex += 3;
+            if ($newIndex >= 0) {
+                $this->index = $newIndex;
+            } else {
+                $this->index = 0;
+                $this->moveSteps($pawnColor, $newIndex);
+            }
+
+            return;
         }
 
         if ($this->section === BoardSection::margin) {
-            if ($this->index < 0) {
+            $newIndex = $this->index + $steps;
+
+            if ($newIndex < 0) {
+                $newIndex += 15;
+                if ($newIndex < 0)
+                    throw new BgaVisibleSystemException("number of steps was too big");
+
                 $this->color = $this->color->getPreviousColor();
-                $this->index += 15;
-                $this->simplifyLocation($pawnColor);
+                $this->index = $newIndex;
                 return;
             }
 
-            if ($this->index >= 3 && $this->color === $pawnColor) {
+            if ($this->index < 3 && $newIndex >= 3 && $this->color === $pawnColor) {
                 $this->section = BoardSection::safety;
-                $this->index -= 3;
-                $this->simplifyLocation($pawnColor);
+                $this->index = 0;
+                $this->moveSteps($pawnColor, $newIndex - 3);
                 return;
             }
 
-            if ($this->index < 15)
+            if ($newIndex < 15) {
+                $this->index = $newIndex;
                 return;
+            }
 
-            // $index >= 15 && $color != $pawnColor
+            $newIndex -= 15;
+            if ($newIndex > 14)
+                throw new BgaVisibleSystemException("number of steps was too big");
+
             $this->color = $this->color->getNextColor();
-            $this->index -= 15;
+            $this->index = 0;
+            $this->moveSteps($pawnColor, $newIndex);
             return;
         }
 
