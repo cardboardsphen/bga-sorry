@@ -433,30 +433,20 @@ class Game extends \Table {
 
         if ($card == 7) {
             $pawns = $this->getRowsFromDb("SELECT distinct pawn_id from possible_moves where player = '$playerId'");
-            $this->dump('$pawns', $pawns);
             foreach ($pawns as $pawn) {
-                $possibleMoves = $this->getRowsFromDb("SELECT id, number_of_steps from possible_moves where player = '$playerId' and pawn_id = '$pawn->pawnId'");
-                $otherPawnsPossibleMoves = $this->getRowsFromDb("SELECT number_of_steps from possible_moves where player = '$playerId' and pawn_id != '$pawn->pawnId'");
-                $this->dump('$possibleMoves', $possibleMoves);
-                $this->dump('$otherPawnsPossibleMoves', $otherPawnsPossibleMoves);
+                $possibleMoves = $this->getRowsFromDb("SELECT id, number_of_steps from possible_moves where player = '$playerId' and pawn_id = '$pawn->pawnId' and number_of_steps < 7");
+                $otherPawnsPossibleMoves = $this->getRowsFromDb("SELECT number_of_steps from possible_moves where player = '$playerId' and pawn_id != '$pawn->pawnId' and number_of_steps < 7");
+                foreach ($possibleMoves as $move) {
+                    $found_7sAddendPair = false;
+                    foreach ($otherPawnsPossibleMoves as $otherMove) {
+                        if ($move->numberOfSteps + $otherMove->numberOfSteps == 7)
+                            $found_7sAddendPair = true;
+                    }
+
+                    if (!$found_7sAddendPair)
+                        $this->DbQuery("DELETE from possible_moves where id = '$move->id'");
+                }
             }
-            //            foreach ($possibleMoves as $pawnId => $moves) {
-            //                foreach (array_keys($moves) as $numSteps) {
-            //                    $found_7sAddendPair = false;
-            //                    foreach ($possibleMoves as $otherPawnId => $otherMoves) {
-            //                        if ($otherPawnId == $pawnId)
-            //                            continue;
-            //
-            //                        foreach (array_keys($otherMoves) as $numOtherSteps) {
-            //                            if ($numSteps + $numOtherSteps == 7)
-            //                                $found_7sAddendPair = true;
-            //                        }
-            //                    }
-            //
-            //                    if (!$found_7sAddendPair)
-            //                        unset($moves[$numSteps]);
-            //                }
-            //            }
         }
     }
 
@@ -465,7 +455,6 @@ class Game extends \Table {
      */
     private function getPossibleMoves(Pawn $pawn, string $card): array {
         $cardVal = intval($card);
-        $this->debug("moves for #$pawn->id, $card");
 
         if ($pawn->location->section === BoardSection::home)
             return [];
@@ -501,7 +490,6 @@ class Game extends \Table {
         }
 
         if ($cardVal == 7) {
-            $this->debug("card is 7");
             $possibleMoves = [];
             for ($i = 1; $i <= 7; $i++)
                 $this->addMoveIfPossible($possibleMoves, $pawn, $i);
@@ -529,13 +517,11 @@ class Game extends \Table {
      */
     private function addMoveIfPossible(array &$possibleMoves, Pawn $pawn, int $numSteps): void {
         $destination = BoardLocation::fromPawnMove($pawn, $numSteps);
-        $this->dump("trying to move to", $destination);
         if ($this->pawnCanMoveToLocation($pawn, $destination, $numSteps))
             $possibleMoves[] = Move::create($pawn, $destination, $numSteps);
     }
 
     private function pawnCanMoveToLocation(Pawn $pawn, ?BoardLocation $location): bool {
-        $this->dump('$location', $location);
         if (is_null($location))
             return false;
 
@@ -546,7 +532,6 @@ class Game extends \Table {
             return true;
 
         $sameColorPawnsAtLocation = self::getRowsFromDb("SELECT id from pawns where color = '{$pawn->color->name}' and board_section = '{$location->section->name}' and board_section_color = '{$location->color->name}' and board_section_index = '$location->index'");
-        $this->dump('$sameColorPawnsAtLocation', $sameColorPawnsAtLocation);
         return count($sameColorPawnsAtLocation) == 0;
     }
 
