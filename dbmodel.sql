@@ -34,7 +34,13 @@ create table if not exists pawns (
     board_section enum('start', 'margin', 'safety', 'home') not null,
     board_section_color enum('red', 'blue', 'yellow', 'green') not null,
     board_section_index smallint unsigned,
-    primary key (player, id)
+    primary key (player, id),
+    constraint index_valid_check check (
+        (board_section = 'start' and board_section_index is null) or
+        (board_section = 'margin' and board_section_index < 15) or
+        (board_section = 'safety' and board_section_index < 5) or
+        (board_section = 'home' and board_section_index is null)
+    )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 create table if not exists possible_moves (
@@ -43,7 +49,7 @@ create table if not exists possible_moves (
     pawn_id smallint unsigned not null,
     destination_section enum('start', 'margin', 'safety', 'home') not null,
     destination_section_color enum('red', 'blue', 'yellow', 'green') not null,
-    destination_section_index smallint unsigned not null,
+    destination_section_index smallint unsigned,
     optional boolean not null,
     number_of_steps smallint unsigned not null,
     selected boolean not null default false,

@@ -426,7 +426,7 @@ class Game extends \Table {
         foreach ($pawns as $pawn) {
             $moves = $this->getPossibleMoves(Pawn::fromDb($pawn), $card);
             foreach ($moves as $move)
-                $sqlRows[] = "('$playerId', '$pawn->id', '{$move->destination->section->name}', '{$move->destination->color->name}', '{$move->destination->index}', '" . ($move->isOptional ? 1 : 0) . "', '$move->numberOfSteps')";
+                $sqlRows[] = "('$playerId', '$pawn->id', '{$move->destination->section->name}', '{$move->destination->color->name}', nullif('{$move->destination->index}',''), '" . ($move->isOptional ? 1 : 0) . "', '$move->numberOfSteps')";
         }
         if (count($sqlRows) > 0)
             $this->DbQuery($sql . implode(',', $sqlRows));
