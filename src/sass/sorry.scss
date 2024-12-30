@@ -18,6 +18,11 @@
 //********* You can start writing your CSS below this line: **********/
 
 
+:root {
+    --x-translation: 0;
+    --y-translation: 0;
+}
+
 #board {
     position: relative;
     width: 900px;
@@ -46,30 +51,78 @@
 #home-yellow { left: 676px; top: 451px; }
 #home-green { left: 351px; top: 676px; }
 
-@keyframes outline-pulse {
-    0% { outline-color: orangered; }
-    90% { outline-color: orangered; }
-    100% { outline-color: orange; }
-}
-.possible-move {
-    z-index: 1;
-    outline-width: 5px;
-    outline-style:  dashed;
-    cursor: pointer;
-    animation: outline-pulse 4s linear infinite alternate;
-}
-
 .pawn {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     position: absolute;
     background-image: url('img/pawns.png');
+    z-index: 1;
 
     &[data-color="red"] { background-position: 0% 0%; }
     &[data-color="blue"] { background-position: 100% 0%; }
     &[data-color="yellow"] { background-position: 100% 100%; }
     &[data-color="green"] { background-position: 0% 100%; }
+}
+
+@keyframes possible-move-outline-pulse {
+    0% { transform: none; }
+    75% { transform: none; }
+    100% { transform: scale(1.05); }
+}
+@keyframes possible-move-background-pulse {
+    0% { opacity: 0.6 }
+    85% { opacity: 0.6 }
+    100% { opacity: 0.7 }
+}
+.possible-move {
+    outline-width: 5px;
+    outline-style:  dashed;
+    cursor: pointer;
+    z-index: 2;
+
+    &.card-pile {
+        outline-color: orange;
+    }
+
+    &.pawn,&.circle,&.square {
+        animation: possible-move-outline-pulse 2s cubic-bezier(0.1, -0.6, 0.2, 0) infinite alternate;
+    }
+
+    &.pawn {
+        &[id$="0"] { outline-color: cyan; }
+        &[id$="1"] { outline-color: fuchsia; }
+        &[id$="2"] { outline-color: chartreuse; }
+        &[id$="3"] { outline-color: orange; }
+    }
+
+    &.circle,&.square {
+        &.for-pawn-0 { outline-color: cyan; }
+        &.for-pawn-1 { outline-color: fuchsia; }
+        &.for-pawn-2 { outline-color: chartreuse; }
+        &.for-pawn-3 { outline-color: orange; }
+    }
+}
+.possible-move-destination {
+    opacity: 0.6;
+    animation: possible-move-background-pulse 2s cubic-bezier(0.1, -0.6, 0.2, 0) infinite alternate;
+
+    &.for-pawn-0 { background-color: cyan; }
+    &.for-pawn-1 { background-color: fuchsia; }
+    &.for-pawn-2 { background-color: chartreuse; }
+    &.for-pawn-3 { background-color: orange; }
+}
+
+@keyframes selected-move-outline-pulse {
+    0% { outline-color: green; }
+    90% { outline-color: green; }
+    100% { outline-color: greenyellow; }
+}
+.selected-move {
+    outline-width: 5px;
+    outline-style:  dashed;
+    cursor: pointer;
+    animation: selected-move-outline-pulse 4s linear infinite alternate;
 }
 
 .card-pile {
@@ -139,8 +192,6 @@
 
 #reveal-card {
     // default is at the draw pile
-#draw-pile { left: 375px; top: 325px; }
-#discard-pile { left: 375px; top: 475px; }
     left: 377px;
     top: 423px;
     width: 96px;
@@ -172,5 +223,55 @@
 
         .front { transform: none; }
         .back { transform: rotateY(-180deg); }
+    }
+}
+
+@keyframes shuffle-card {
+    0% { transform: none; }
+    30% { transform: scale(1.4) translate3d(-10px, 20px, 50px) rotate(60deg); }
+    65% { transform: scale(1.4) translate3d(20px, 30px, 50px) rotate(120deg); }
+    100% { transform: translate3d(46px, 46px, 0) rotate(180deg); }
+}
+@keyframes shuffle-card-front {
+    0% { transform: none; }
+    40% { transform: translate(var(--x-translation), var(--y-translation)); }
+    80% { transform: none;}
+    100% { transform: rotateY(-180deg);}
+}
+@keyframes shuffle-card-back {
+    0% { transform: rotateY(180deg); }
+    40% { transform: translate(var(--x-translation), var(--y-translation)) rotateY(180deg); }
+    80% { transform: rotateY(180deg); }
+    100% { transform: none; }
+}
+#shuffle-cards {
+    left: 377px;
+    top: 573px;
+    width: 96px;
+    height: 146px;
+    position: absolute;
+    transform: rotate(-90deg);
+    transform-origin: top left;
+    z-index: 3;
+
+    .shuffle-card {
+        transform-origin: 100px 50px;
+
+        .card {
+            left: 0px;
+            top: 0px;
+            transform: none;
+            transform-origin: center;
+            backface-visibility: hidden;
+
+            &.back { transform: rotateY(180deg); }
+        }
+    }
+
+    &.shuffling .shuffle-card {
+        animation: shuffle-card 3s linear forwards;
+
+        .front { animation: shuffle-card-front 3s linear forwards; }
+        .back { animation: shuffle-card-back 3s linear forwards; }
     }
 }

@@ -27,6 +27,11 @@ create table if not exists cards (
     pile enum('draw', 'discard') not null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ------
+-- The check constraint doesn't work because as of 2024-12-28, BGA uses MySql 5.7.44, which doesn't support check constraints.
+-- Since it doesn't cause an errors, I'm leaving it in for a future upgrade.
+-- It's not critical to anything, but it would be nice to have.
+-- ------
 create table if not exists pawns (
     player int unsigned not null,
     id smallint unsigned not null,
@@ -51,8 +56,8 @@ create table if not exists possible_moves (
     destination_section_color enum('red', 'blue', 'yellow', 'green') not null,
     destination_section_index smallint unsigned,
     optional boolean not null,
-    number_of_steps smallint unsigned not null,
-    selected boolean not null default false,
+    number_of_steps smallint not null,
+    selected_as enum('none', 'pawn', 'first_move', 'final_move', 'blocked') not null default 'none',
     foreign key (player, pawn_id)
         references pawns (player, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
