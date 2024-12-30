@@ -8,6 +8,7 @@ use Bga\Games\Sorry\Models\Pawn;
 
 use BgaVisibleSystemException;
 use OutOfRangeException;
+use stdClass;
 
 /**
  * Represents a location on the board.
@@ -51,6 +52,41 @@ class BoardLocation {
      */
     public static function create(string $section, string $color, ?int $index = null): BoardLocation {
         return new self($section, $color, $index);
+    }
+
+    /**
+     * Creates a new location on the board from a database object.
+     * This can be either from potental_moves (looks for destination_[...] fields) or from pawns (looks for board_[...] fields).
+     * If both destination and board fields are present, the destination fields are used.
+     *
+     * @param stdClass $location The database object.
+     *
+     * @return BoardLocation|null Returns the location if the object contains the required fields; null otherwise.
+     */
+    public static function fromDb(stdClass $location): ?BoardLocation {
+        $section = isset($location->destinationSection)
+            ? $location->destinationSection
+            : (isset($location->boardSection) ? $location->boardSection : null);
+        if (is_null($section))
+            return null;
+
+        $color = isset($location->destinationSectionColor)
+            ? $location->destinationSectionColor
+            : (isset($location->boardSectionColor) ? $location->boardSectionColor : null);
+        if (is_null($color))
+            return null;
+
+        if (!property_exists($location, 'destinationSectionIndex') && !property_exists($location, 'boardSectionIndex'))
+            return null;
+        $index = (property_exists($location, 'destinationSectionIndex'))
+            ? $location->destinationSectionIndex
+            : $location->boardSectionIndex;
+
+        return new self(
+            $section,
+            $color,
+            is_null($index) ? $index : intval($index),
+        );
     }
 
     /**

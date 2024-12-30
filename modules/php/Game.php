@@ -466,7 +466,7 @@ class Game extends \Table {
 
             if ($card == 'sorry') {
                 $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->playerId} and board_section = 'margin'");
-                return array_map(fn($otherPawn) => Move::create($pawn, Pawn::fromDb($otherPawn)->location), $otherPlayerPawnsOnMargin);
+                return array_map(fn($otherPawn) => Move::create($pawn, BoardLocation::fromDb($otherPawn)), $otherPlayerPawnsOnMargin);
             }
 
             return [];
@@ -501,7 +501,10 @@ class Game extends \Table {
 
             if ($pawn->location->section === BoardSection::margin) {
                 $otherPlayerPawnsOnMargin = self::getRowsFromDb("SELECT board_section, board_section_color, board_section_index from pawns where player != {$pawn->playerId} and board_section = 'margin'");
-                $swapMoves = array_map(fn($otherPawn) => Move::create($pawn, $otherPawn->location, isOptional: true), $otherPlayerPawnsOnMargin);
+                $swapMoves = array_map(
+                    fn($otherPawn) => Move::create($pawn, BoardLocation::fromDb($otherPawn), isOptional: true),
+                    $otherPlayerPawnsOnMargin
+                );
                 $possibleMoves = array_merge($possibleMoves, $swapMoves);
             }
 
