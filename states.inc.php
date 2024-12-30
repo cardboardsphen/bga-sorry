@@ -78,8 +78,8 @@ $machinestates = [
         "descriptionmyturn" => clienttranslate('${you} ${cardDescription}'),
         "type" => "activeplayer",
         "args" => "argSelectPawn",
-        "possibleactions" => ["actSelectPawn"],
-        "transitions" => ["movePawn" => States::MOVE_PAWN, "selectSquare" => States::PLAYER_SELECT_SQUARE]
+        "possibleactions" => ["actSelectPawn", "actUndoSelection"],
+        "transitions" => ["nextPlayer" => States::NEXT_PLAYER, "movePawn" => States::MOVE_PAWN, "selectSquare" => States::PLAYER_SELECT_SQUARE]
     ],
 
     States::PLAYER_SELECT_SQUARE => [
@@ -88,12 +88,13 @@ $machinestates = [
         "descriptionmyturn" => clienttranslate('${you} ${cardDescription}'),
         "type" => "activeplayer",
         "args" => "argSelectSquare",
-        "possibleactions" => ["actSelectSquare"],
-        "transitions" => ["movePawn" => States::MOVE_PAWN, "zombiePass" => States::END]
+        "possibleactions" => ["actSelectSquare", "actUndoSelection"],
+        "transitions" => ["movePawn" => States::MOVE_PAWN, "selectPawn" => States::PLAYER_SELECT_PAWN, "zombiePass" => States::END]
     ],
 
     States::MOVE_PAWN => [
         "name" => "movePawn",
+        "description" => "moving pawns",
         "type" => "game",
         "action" => "stMovePawn",
         "transitions" => ["nextPlayer" => States::NEXT_PLAYER, "secondMove" => States::PLAYER_SELECT_PAWN, "drawAgain" => States::PLAYER_DRAW_CARD]
