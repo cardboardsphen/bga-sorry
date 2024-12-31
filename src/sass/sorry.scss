@@ -105,7 +105,7 @@
 }
 .possible-move-destination {
     opacity: 0.6;
-    animation: possible-move-background-pulse 2s cubic-bezier(0.1, -0.6, 0.2, 0) infinite alternate;
+    animation: possible-move-background-pulse 2.4s cubic-bezier(0.1, -0.6, 0.2, 0) infinite alternate;
 
     &.for-pawn-0 { background-color: cyan; }
     &.for-pawn-1 { background-color: fuchsia; }
@@ -227,10 +227,10 @@
 }
 
 @keyframes shuffle-card {
-    0% { transform: none; }
+    0% { transform: none; animation-timing-function: ease-in; }
     30% { transform: scale(1.4) translate3d(-10px, 20px, 50px) rotate(60deg); }
     65% { transform: scale(1.4) translate3d(20px, 30px, 50px) rotate(120deg); }
-    100% { transform: translate3d(46px, 46px, 0) rotate(180deg); }
+    100% { transform: translate3d(46px, 46px, 0) rotate(180deg); animation-timing-function: ease-out; }
 }
 @keyframes shuffle-card-front {
     0% { transform: none; }
