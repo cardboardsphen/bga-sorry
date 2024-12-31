@@ -103,8 +103,7 @@ export default class Sorry extends GameGui {
                 document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('possible-move');
 
                 for (let location of args.args.possibleMoves[pawnId]) {
-                    let locationId = `${location.section}-${location.color}`;
-                    if (location.index) locationId += `-${location.index}`;
+                    let locationId = this.getLocationId(location.section, location.color, location.index);
                     let locationElement = document.getElementById(locationId)!;
                     locationElement.classList.add('possible-move-destination');
                     locationElement.classList.add(`for-pawn-${pawnId}`);
@@ -140,8 +139,7 @@ export default class Sorry extends GameGui {
                 document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('selected');
 
                 for (let location of args.args.possibleMoves[pawnId]) {
-                    let locationId = `${location.section}-${location.color}`;
-                    if (location.index) locationId += `-${location.index}`;
+                    let locationId = this.getLocationId(location.section, location.color, location.index);
                     let locationElement = document.getElementById(locationId)!;
                     locationElement.classList.add('possible-move');
                     locationElement.classList.add(`for-pawn-${pawnId}`);
@@ -186,7 +184,7 @@ export default class Sorry extends GameGui {
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
-        if (card.classList.contains('revealed')) {
+        if (card.classList.contains('revealing') || card.classList.contains('revealed')) {
             card.removeAttribute('class');
             card.classList.add('discarding');
         } else {
@@ -393,6 +391,12 @@ export default class Sorry extends GameGui {
         }
     }
 
+    getLocationId(section: string, color: string, index: number | null): string {
+        let destinationId = `${section}-${color}`;
+        if (index !== null) destinationId += `-${index}`;
+        return destinationId;
+    }
+
     revealCardAnmiationStopped(e: AnimationEvent): void {
         let card = e.currentTarget as HTMLElement;
         if (card.classList.contains('revealing')) {
@@ -419,8 +423,7 @@ export default class Sorry extends GameGui {
 
     jumpPawnToLocation(pawnElementId: string, pawnId: number, section: string, sectionColor: string, sectionIndex: string) {
         let pawnElement = document.getElementById(pawnElementId)!;
-        let locationId = `${section}-${sectionColor}`;
-        if (sectionIndex) locationId += `-${sectionIndex}`;
+        let locationId = this.getLocationId(section, sectionColor, sectionIndex === null ? null : parseInt(sectionIndex));
 
         // fan out the pawns if on start or home
         if (section == 'start' || section == 'home') {

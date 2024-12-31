@@ -154,8 +154,7 @@ class Game extends \Table {
         $this->DbQuery("UPDATE cards set pile = 'discard' where id = $thisCard->id");
 
         $rank = $thisCard->rank;
-        $this->notifyAllPlayers('drawCard', '', ['rank' => $rank, 'hasMoreToDraw' => count($topCards) > 1]);
-        $this->notifyAllPlayers('simplePause', '', ['time' => 2500]);
+        $this->triggerClientAnimationOfDraw($rank, count($topCards) > 1);
 
         $this->notifyAllPlayers(
             'drawCardMessage',
@@ -272,6 +271,7 @@ class Game extends \Table {
 
         if ($rank == '2') {
             $this->notifyAllPlayers('drawAgain', clienttranslate('${player_name} gets to draw again.'), ['player_name' => $this->getActivePlayerName()]);
+            $this->triggerClientAnimationOfDiscard();
             $this->gamestate->nextState('drawAgain');
             return;
         }
@@ -665,32 +665,15 @@ class Game extends \Table {
             );
             $this->notifyAllPlayers('simplePause', '', ['time' => 5000]);
         } else {
-            $this->DbQuery("UPDATE pawns set board_section = '{$move->pawn->location->section->name}', board_section_color = '{$move->pawn->location->color->name}', board_section_index = {$move->pawn->location->index} where player = '$bumppedPawn->player' and id = '$bumppedPawn->id'");
-            $this->DbQuery("UPDATE pawns set board_section = '$bumppedPawn->boardSection', board_section_color = '$bumppedPawn->boardSectionColor', board_section_index = '$bumppedPawn->boardSectionIndex' where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
-            $this->notifyAllPlayers(
-                'swapPawns',
-                clienttranslate('${player_name} swaps pawn places with ${player_name2}.'),
-                [
-                    'player_name' => $this->getActivePlayerName(),
-                    'player_name2' => $this->getPlayerNameById($bumppedPawn->player),
-
-                    'playerId' => $move->pawn->playerId,
-                    'pawnId' => $move->pawn->id,
-                    'destinationSection' => $move->destination->section->name,
-                    'destinationColor' => $move->destination->color->name,
-                    'destinationIndex' => $move->destination->index,
-                    'bumppedPlayerId' => $bumppedPawn->player,
-                    'bumppedPawnId' => $bumppedPawn->id,
-                ]
-            );
-            $this->notifyAllPlayers('simplePause', '', ['time' => 5000]);
-        }
+    private function triggerClientAnimationOfDraw(string $rank, bool $hasMoreToDraw): void {
+        $this->notifyAllPlayers('drawCard', '', ['rank' => $rank, 'hasMoreToDraw' => $hasMoreToDraw]);
+        $this->notifyAllPlayers('simplePause', '', ['time' => 3100]);
     }
 
     private function triggerClientAnimationOfDiscard(): void {
         $rank = self::getFirstRowFromDb("SELECT id, rank from cards where pile = 'discard' order by position desc limit 1")->rank;
         $this->notifyAllPlayers('discardCard', '', ['rank' => $rank]);
-        $this->notifyAllPlayers('simplePause', '', ['time' => 3000]);
+        $this->notifyAllPlayers('simplePause', '', ['time' => 2100]);
     }
 
     public function triggerClientAnimationOfMoves(Move $move): void {
