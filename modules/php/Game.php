@@ -196,20 +196,21 @@ class Game extends \Table {
     public function actSelectPawn(int $pawnId) {
         $player = $this->getActivePlayerName();
         $rank = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
-        $possibleMoves = self::getRowsFromDb("SELECT pawn_id, number_of_steps, selected_as from possible_moves where pawn_id = '$pawnId' and selected_as = 'none'");
-
-        if (count($possibleMoves) == 0)
-            throw new BgaUserException(sprintf($this->_('%s can not move that pawn right now.'), $player));
 
         if ($pawnId < 0) {
             $canSkip = self::getFirstRowFromDb("SELECT count(optional) as numberRequired from possible_moves where pawn_id = '$pawnId' and optional = false")->numberRequired == 0;
             if (!$canSkip)
                 throw new BgaUserException(sprintf($this->_('%s has valid moves and can not skip right now.'), $player));
 
+            $this->notifyAllPlayers('skipTurn', clienttranslate('${player_name} skips their turn.'), ['player_name' => $player]);
             $this->triggerClientAnimationOfDiscard();
             $this->gamestate->nextState('nextPlayer');
             return;
         }
+
+        $possibleMoves = self::getRowsFromDb("SELECT pawn_id, number_of_steps, selected_as from possible_moves where pawn_id = '$pawnId' and selected_as = 'none'");
+        if (count($possibleMoves) == 0)
+            throw new BgaUserException(sprintf($this->_('%s can not move that pawn right now.'), $player));
 
         if (count($possibleMoves) == 1) {
             $hasPreviousSelection = self::getFirstRowFromDb("SELECT count(id) as count from possible_moves where pawn_id != '$pawnId' and selected_as = 'first_move'")->count  == 1;
@@ -232,7 +233,10 @@ class Game extends \Table {
 
     public function actSelectSquare(string $squareId): void {
         $player = $this->getActivePlayerName();
-        [$section, $color, $index] = explode('-', $squareId);
+        $square = explode('-', $squareId);
+        $section = $square[0];
+        $color = $square[1];
+        $index = count($square) > 2 ? $square[2] : null;
         $hasPreviousSelection = self::getFirstRowFromDb("SELECT count(id) as count from possible_moves where selected_as = 'first_move'")->count == 1;
         $rank = self::getFirstRowFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 1")->rank;
 
@@ -650,28 +654,18 @@ class Game extends \Table {
     }
 
     private function swapPawns(Move $move): void {
-        $bumppedPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index = nullif('{$move->destination->index}','')");
+        $otherPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index = nullif('{$move->destination->index}','')");
         if ($move->pawn->location->section === BoardSection::start) {
-            $this->DbQuery("UPDATE pawns set board_section = 'start', board_section_color = '$bumppedPawn->color', board_section_index = null where player = '$bumppedPawn->player' and id = '$bumppedPawn->id'");
-            $this->DbQuery("UPDATE pawns set board_section = '$bumppedPawn->boardSection', board_section_color = '$bumppedPawn->boardSectionColor', board_section_index = '$bumppedPawn->boardSectionIndex' where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
-            $this->notifyAllPlayers(
-                'sorry',
-                clienttranslate('SORRY! ${player_name} moves out a pawn from Start and bumps ${player_name2}\'s pawn back to Start.'),
-                [
-                    'player_name' => $this->getActivePlayerName(),
-                    'player_name2' => $this->getPlayerNameById($bumppedPawn->player),
-
-                    'playerId' => $move->pawn->playerId,
-                    'pawnId' => $move->pawn->id,
-                    'destinationSection' => $move->destination->section->name,
-                    'destinationColor' => $move->destination->color->name,
-                    'destinationIndex' => $move->destination->index,
-                    'bumppedPlayerId' => $bumppedPawn->player,
-                    'bumppedPawnId' => $bumppedPawn->id,
-                ]
-            );
-            $this->notifyAllPlayers('simplePause', '', ['time' => 5000]);
+            $this->DbQuery("UPDATE pawns set board_section = 'start', board_section_color = '$otherPawn->color', board_section_index = null where player = '$otherPawn->player' and id = '$otherPawn->id'");
+            $this->DbQuery("UPDATE pawns set board_section = '$otherPawn->boardSection', board_section_color = '$otherPawn->boardSectionColor', board_section_index = '$otherPawn->boardSectionIndex' where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
+            $this->triggerClientAnimationOfSorry($move, Pawn::fromDb($otherPawn));
         } else {
+            $this->DbQuery("UPDATE pawns set board_section = '{$move->pawn->location->section->name}', board_section_color = '{$move->pawn->location->color->name}', board_section_index = {$move->pawn->location->index} where player = '$otherPawn->player' and id = '$otherPawn->id'");
+            $this->DbQuery("UPDATE pawns set board_section = '$otherPawn->boardSection', board_section_color = '$otherPawn->boardSectionColor', board_section_index = '$otherPawn->boardSectionIndex' where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
+            $this->triggerClientAnimationOfSwap($move->pawn, Pawn::fromDb($otherPawn));
+        }
+    }
+
     private function triggerClientAnimationOfDraw(string $rank, bool $hasMoreToDraw): void {
         $this->notifyAllPlayers('drawCard', '', ['rank' => $rank, 'hasMoreToDraw' => $hasMoreToDraw]);
         $this->notifyAllPlayers('simplePause', '', ['time' => 3100]);
@@ -703,20 +697,24 @@ class Game extends \Table {
 
         $step = $move->numberOfSteps < 0 ? -1 : 1;
         for ($i = 0; $i != $move->numberOfSteps; $i += $step) {
-            $incrementalLocation = BoardLocation::fromPawnMove($move->pawn, 1 + $i);
-            $this->notifyAllPlayers(
-                'stepPawn',
-                '',
-                [
-                    'playerId' => $move->pawn->playerId,
-                    'pawnId' => $move->pawn->id,
-                    'destinationSection' => $incrementalLocation->section->name,
-                    'destinationColor' => $incrementalLocation->color->name,
-                    'destinationIndex' => $incrementalLocation->index,
-                ]
-            );
-            $this->notifyAllPlayers('simplePause', '', ['time' => 1000]);
+            $incrementalLocation = BoardLocation::fromPawnMove($move->pawn, $step + $i);
+            $this->triggerClientAnimationOfPawnStep($move->pawn, $incrementalLocation);
         }
+    }
+
+    private function triggerClientAnimationOfPawnStep(Pawn $pawn, BoardLocation $location): void {
+        $this->notifyAllPlayers(
+            'stepPawn',
+            '',
+            [
+                'playerId' => $pawn->playerId,
+                'pawnId' => $pawn->id,
+                'section' => $location->section->name,
+                'color' => $location->color->name,
+                'index' => $location->index,
+            ]
+        );
+        $this->notifyAllPlayers('simplePause', '', ['time' => 1000]);
     }
 
     private function triggerClientAnimationOfSlide(Move $move, int $distanceOfSlide): void {
@@ -736,6 +734,39 @@ class Game extends \Table {
             ]
         );
         $this->notifyAllPlayers('simplePause', '', ['time' => 2000]);
+    }
+
+    private function triggerClientAnimationOfSorry(Move $move, Pawn $bumppedPawn) {
+        $this->triggerClientAnimationOfPawnStep($move->pawn, $move->destination);
+        $this->notifyAllPlayers(
+            'sorry',
+            clienttranslate('SORRY! ${player_name} moves out a pawn from Start and bumps ${player_name2}\'s pawn back to Start.'),
+            [
+                'player_name' => $this->getActivePlayerName(),
+                'player_name2' => $this->getPlayerNameById($bumppedPawn->playerId),
+
+                'bumppedPlayerId' => $bumppedPawn->playerId,
+                'bumppedPawnId' => $bumppedPawn->id,
+            ]
+        );
+        $this->notifyAllPlayers('simplePause', '', ['time' => 5000]);
+    }
+
+    private function triggerClientAnimationOfSwap(Pawn $pawn, Pawn $otherPawn) {
+        $this->notifyAllPlayers(
+            'swapPawns',
+            clienttranslate('${player_name} swaps pawn places with ${player_name2}.'),
+            [
+                'player_name' => $this->getActivePlayerName(),
+                'player_name2' => $this->getPlayerNameById($otherPawn->playerId),
+
+                'playerId' => $pawn->playerId,
+                'pawnId' => $pawn->id,
+                'otherPlayerId' => $otherPawn->playerId,
+                'otherPawnId' => $otherPawn->id,
+            ]
+        );
+        $this->notifyAllPlayers('simplePause', '', ['time' => 3000]);
     }
 
     private function bumpPawnIfPresent(Move $move): void {
