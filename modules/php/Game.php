@@ -183,6 +183,13 @@ class Game extends \Table {
             ]
         );
         $this->triggerClientAnimationOfDiscard();
+
+        if ($rank == '2') {
+            $this->notifyAllPlayers('drawAgain', clienttranslate('${player_name} gets to draw again.'), ['player_name' => $this->getActivePlayerName()]);
+            $this->gamestate->nextState('drawAgain');
+            return;
+        }
+
         $this->gamestate->nextState("nextPlayer");
     }
 
