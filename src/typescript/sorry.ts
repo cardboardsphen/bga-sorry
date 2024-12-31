@@ -197,6 +197,16 @@ export default class Sorry extends GameGui {
         this.shuffleCards(args.rank);
     }
 
+    async notification_stepPawn(args: any): Promise<void> {
+        let destinationId = this.getLocationId(args.section, args.color, args.index);
+        let pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
+
+        this.jumpPawnToLocation(pawnElementId, args.pawnId, args.section, args.color, args.index);
+    }
+    async notification_slidePawn(args: any): Promise<void> {}
+    async notification_sorry(args: any): Promise<void> {}
+    async notification_swapPawns(args: any): Promise<void> {}
+
     ///////////////////////////////////////////////////
     //// Utility functions
 
