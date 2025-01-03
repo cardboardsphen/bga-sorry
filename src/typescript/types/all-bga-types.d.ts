@@ -17067,6 +17067,18 @@ declare module 'ebg/core/core' {
             x?: number,
             y?: number
         ): InstanceType<typeof dojo.Animation>;
+
+        /**
+         * Function to know if animations should be played.
+         * Animations should not be played in instantaneousMode (fast-replay mode), or if the tab is not displayed in the browser.
+         * @returns a boolean saying if animations should be played.
+         */
+        bgaAnimationsActive(): boolean;
+        /**
+         * await this method to hold promise for the specified time.
+         * Use to allow time for animations to complete, etc.
+         */
+        wait(waitTimeInMiliseconds: number): Promise<void>;
         /**
          * Slides an element to a target position. Sliding element on the game area is the recommended and the most used way to animate your game interface. Using slides allow players to figure out what is happening on the game, as if they were playing with the real boardgame.
          * @param target The element to move. This object must be "relative" or "absolute" positioned.

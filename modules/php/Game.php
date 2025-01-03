@@ -65,25 +65,6 @@ class Game extends \Table {
      * @return array
      * @see ./states.inc.php
      */
-    public function argDrawCard(): array {
-        $playerId = intval($this->getActivePlayerId());
-        $playerColor = self::getFirstRowFromDb("SELECT player_color_name as color from player where player_id = '$playerId'")->color;
-
-        $pawns = self::getRowsFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns");
-
-        $cards = [];
-        $cards['nextCard'] = self::getFirstRowFromDb("SELECT min(id) as id from cards where pile = 'draw'")->id;
-
-        $topDiscards = self::getRowsFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 2");
-        $cards['lastCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
-
-        return [
-            'color' => $playerColor,
-            'pawns' => $pawns,
-            'cards' => $cards,
-        ];
-    }
-
     public function argSelectPawn(): array {
         $playerId = intval($this->getActivePlayerId());
         $playerColor = self::getFirstRowFromDb("SELECT player_color_name as color from player where player_id = '$playerId'")->color;
@@ -157,7 +138,7 @@ class Game extends \Table {
         $this->triggerClientAnimationOfDraw($rank, count($topCards) > 1);
 
         $this->notifyAllPlayers(
-            'drawCardMessage',
+            'message',
             clienttranslate('${player_name} draws a ${rank} card.'),
             [
                 'player_name' => $this->getActivePlayerName(),
@@ -175,7 +156,7 @@ class Game extends \Table {
         }
 
         $this->notifyAllPlayers(
-            'noValidMoves',
+            'message',
             clienttranslate('${player_name} has no valid moves for ${rank} card.'),
             [
                 'player_name' => $this->getActivePlayerName(),
@@ -687,7 +668,7 @@ class Game extends \Table {
             $message = '${player_name} moves a pawn into his Home.'; // BGA replaces 'his' with player's pronouns magically
 
         $this->notifyAllPlayers(
-            'movePawnMessage',
+            'message',
             clienttranslate($message),
             [
                 'player_name' => $this->getActivePlayerName(),
@@ -704,14 +685,7 @@ class Game extends \Table {
 
     private function triggerClientAnimationOfPawnStep(Pawn $pawn, BoardLocation $location): void {
         $this->notifyAllPlayers(
-            'stepPawn',
-            '',
-            [
-                'playerId' => $pawn->playerId,
-                'pawnId' => $pawn->id,
-                'section' => $location->section->name,
-                'color' => $location->color->name,
-                'index' => $location->index,
+            'message',
             ]
         );
         $this->notifyAllPlayers('simplePause', '', ['time' => 1000]);

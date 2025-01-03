@@ -83,7 +83,6 @@ export default class Sorry extends GameGui {
     //// State Handling
     enteringState_drawCard(args: any): void {
         this.clearPossibleMoves();
-        this.placeBoardPieces(args.args.pawns, args.args.cards); // puts everything right if animations were interrupted
         if (this.isCurrentPlayerActive()) document.getElementById('draw-pile')!.classList.add('possible-move');
     }
 
@@ -136,13 +135,11 @@ export default class Sorry extends GameGui {
 
         if (this.isCurrentPlayerActive()) {
             for (let pawnId in args.args.possibleMoves) {
-                document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('selected');
+                document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('active-pawn', `for-pawn-${pawnId}`);
 
                 for (let location of args.args.possibleMoves[pawnId]) {
                     let locationId = this.getLocationId(location.section, location.color, location.index);
-                    let locationElement = document.getElementById(locationId)!;
-                    locationElement.classList.add('possible-move');
-                    locationElement.classList.add(`for-pawn-${pawnId}`);
+                    document.getElementById(locationId)!.classList.add('possible-move', `for-pawn-${pawnId}`);
                 }
             }
         }
@@ -166,13 +163,14 @@ export default class Sorry extends GameGui {
     ///////////////////////////////////////////////////
     //// Notification Handling
     async notification_drawCard(args: any): Promise<void> {
+        console.log('Received notification: drawCard');
         this.clearPossibleMoves();
 
         let card = document.getElementById('reveal-card')!;
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
-        card.removeAttribute('class');
+        card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
         card.classList.add('revealing');
 
         if (args.hasMoreToDraw) document.getElementById('draw-card')!.classList.remove('hidden');
@@ -180,12 +178,13 @@ export default class Sorry extends GameGui {
     }
 
     async notification_discardCard(args: any): Promise<void> {
+        console.log('Received notification: discardCard');
         let card = document.getElementById('reveal-card')!;
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
         if (card.classList.contains('revealing') || card.classList.contains('revealed')) {
-            card.removeAttribute('class');
+            card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
             card.classList.add('discarding');
         } else {
             document.getElementById('discard-card')!.dataset['rank'] = args.rank;
@@ -194,18 +193,56 @@ export default class Sorry extends GameGui {
     }
 
     async notification_shuffleDeck(args: any): Promise<void> {
+        console.log('Received notification: shuffleDeck');
         this.shuffleCards(args.rank);
     }
 
-    async notification_stepPawn(args: any): Promise<void> {
-        let destinationId = this.getLocationId(args.section, args.color, args.index);
-        let pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
+    async notification_movePawns(args: any): Promise<void> {
+        console.log('Received notification: jumpPawn');
+        this.clearPossibleMoves();
+        const pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
+        const pawn = document.getElementById(pawnElementId)!;
+        const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
+        const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
 
-        this.jumpPawnToLocation(pawnElementId, args.pawnId, args.section, args.color, args.index);
+        const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, args.pawnId, args.section, args.color, args.index);
+        if (!this.bgaAnimationsActive()) {
+            pawn.style.left = `${startingLeft + offsetLeft}px`;
+            pawn.style.top = `${startingTop + offsetTop}px`;
+            return;
+        }
+
+        const distance = Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50;
+        const duration = 1000 * distance;
+        requestAnimationFrame((timestamp) =>
+            this.jumpPawnStep(pawn, document.timeline.currentTime as number, duration, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
+        );
+        await this.wait(duration);
     }
-    async notification_slidePawn(args: any): Promise<void> {}
-    async notification_sorry(args: any): Promise<void> {}
-    async notification_swapPawns(args: any): Promise<void> {}
+
+    async notification_slidePawn(args: any): Promise<void> {
+        console.log('Received notification: slidePawn');
+        const pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
+        const pawn = document.getElementById(pawnElementId)!;
+        const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
+        const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
+
+        const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, args.pawnId, args.section, args.color, args.index);
+        if (!this.bgaAnimationsActive()) {
+            pawn.style.left = `${startingLeft + offsetLeft}px`;
+            pawn.style.top = `${startingTop + offsetTop}px`;
+            return;
+        }
+
+        const duration = 2000;
+        requestAnimationFrame((timestamp) =>
+            this.slidePawnStep(pawn, document.timeline.currentTime as number, duration, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
+        );
+    }
+
+    async notification_swapPawns(args: any): Promise<void> {
+        console.log('Received notification: swapPawns');
+    }
 
     ///////////////////////////////////////////////////
     //// Utility functions
@@ -359,23 +396,29 @@ export default class Sorry extends GameGui {
             pawn.addEventListener('click', (e) => {
                 const clickedPawn = e.currentTarget as HTMLElement;
                 if (clickedPawn.classList.contains('possible-move') && this.checkAction('actSelectPawn', true))
-                    this.bgaPerformAction('actSelectPawn', {
-                        pawnId: clickedPawn.id.match(/\d+$/),
-                    });
+                    this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
             })
         );
     }
 
     /**
-     * Places or replaces all the board pieces on the game board.
-     * This method can be called at anytime to update the board.
+     * Places all the board pieces on the game board.
      *
      * @param gamedatas Data from the server.
      */
     placeBoardPieces(pawns: any, cards: any): void {
         for (let pawn of pawns) {
             let pawnElementId = `pawn-${pawn.player}-${pawn.id}`;
-            this.jumpPawnToLocation(pawnElementId, pawn.id, pawn.boardSection, pawn.boardSectionColor, pawn.boardSectionIndex);
+            let pawnElement = document.getElementById(pawnElementId)!;
+            let [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
+                pawn.boardSection,
+                pawn.boardSectionColor,
+                pawn.boardSectionIndex,
+                pawn.id
+            );
+
+            pawnElement.style.left = `${pawnDestinationLeft}px`;
+            pawnElement.style.top = `${pawnDestinationTop}px`;
         }
 
         if (cards.nextCard) {
@@ -385,11 +428,11 @@ export default class Sorry extends GameGui {
         }
 
         if (cards.revealCard) {
-            document.getElementById('reveal-card')!.removeAttribute('class');
+            document.getElementById('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
             document.getElementById('reveal-card')!.classList.add('revealed');
             (document.querySelector('#reveal-card .front') as HTMLElement).dataset['rank'] = cards.revealCard;
         } else {
-            document.getElementById('reveal-card')!.removeAttribute('class');
+            document.getElementById('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
             document.getElementById('reveal-card')!.classList.add('hidden');
         }
 
@@ -410,14 +453,14 @@ export default class Sorry extends GameGui {
     revealCardAnmiationStopped(e: AnimationEvent): void {
         let card = e.currentTarget as HTMLElement;
         if (card.classList.contains('revealing')) {
-            card.removeAttribute('class');
+            document.getElementById('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
             card.classList.add('revealed');
         }
         if (card.classList.contains('discarding')) {
             let rank = (card.querySelector('.front') as HTMLElement).dataset['rank'];
             document.getElementById('discard-card')!.dataset['rank'] = rank;
             document.getElementById('discard-card')!.classList.remove('hidden');
-            card.removeAttribute('class');
+            document.getElementById('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
             card.classList.add('hidden');
         }
     }
@@ -431,29 +474,42 @@ export default class Sorry extends GameGui {
         }
     }
 
-    jumpPawnToLocation(pawnElementId: string, pawnId: number, section: string, sectionColor: string, sectionIndex: string) {
-        let pawnElement = document.getElementById(pawnElementId)!;
+    /**
+     * Gets the position of a pawn at a given space on the board.
+     *
+     * @param pawnId The id of the pawn to be placed at the position. This can be omitted if the pawn is not at start or home.
+     * @returns An array of the form [left, top]. The values are strings which can be used as CSS values.
+     */
+    getPawnCoorinatesInPixelsAtLocation(section: string, sectionColor: string, sectionIndex: string, pawnId: number = 0): [number, number] {
         let locationId = this.getLocationId(section, sectionColor, sectionIndex === null ? null : parseInt(sectionIndex));
+        let boardLocationStyle = window.getComputedStyle(document.getElementById(locationId)!);
+        let locationLeft = this.parseDimensionToPx(boardLocationStyle.left);
+        let locationTop = this.parseDimensionToPx(boardLocationStyle.top);
+        let leftOffset = 4;
+        let topOffset = 4;
 
         // fan out the pawns if on start or home
         if (section == 'start' || section == 'home') {
-            let boardLocationStyle = window.getComputedStyle(document.getElementById(locationId)!);
-            let left = this.parseDimensionToPx(boardLocationStyle.left);
-            let top = this.parseDimensionToPx(boardLocationStyle.top);
-            let leftOffset = Math.floor(pawnId / 2) * 40;
-            let topOffset = (pawnId % 2) * 40;
-            pawnElement.style.left = `${left + 9 + leftOffset}px`;
-            pawnElement.style.top = `${top + 9 + topOffset}px`;
-            return;
+            leftOffset = 9 + Math.floor(pawnId / 2) * 40;
+            topOffset = 9 + (pawnId % 2) * 40;
         }
 
-        this.placeOnObject(pawnElementId, locationId);
+        return [locationLeft + leftOffset, locationTop + topOffset];
+    }
+
+    getPawnOffsetInPixelsToLocation(pawn: HTMLElement, pawnId: number, section: string, color: string, index: string): [number, number] {
+        let pawnLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
+        let pawnTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
+
+        let [pawnAtLocationLeft, pawnAtLocationTop] = this.getPawnCoorinatesInPixelsAtLocation(section, color, index, pawnId);
+
+        return [pawnAtLocationLeft - pawnLeft, pawnAtLocationTop - pawnTop];
     }
 
     parseDimensionToPx(dimension: string): number {
         let [, value, unit] = dimension.match(/([\d\.]+)([a-z%]+)/)!;
         if (!value || !unit) {
-            this['sendMessage']('error', `Could not parse dimension to pixels: ${dimension}`);
+            this.showMessage('error', `Could not parse dimension to pixels: ${dimension}`);
             return 0;
         }
 
@@ -475,6 +531,8 @@ export default class Sorry extends GameGui {
     clearPossibleMoves(): void {
         document.querySelectorAll('.possible-move').forEach((div) => div.classList.remove('possible-move'));
         document.querySelectorAll('.possible-move-destination').forEach((div) => div.classList.remove('possible-move-destination'));
+        document.querySelectorAll('.active-pawn').forEach((div) => div.classList.remove('active-pawn'));
+        document.querySelectorAll('.selected-move').forEach((div) => div.classList.remove('selected-move'));
         document.querySelectorAll('[class*="for-pawn-"]').forEach((div) => {
             let a = div.classList.forEach((className) => {
                 if (className.startsWith('for-pawn')) div.classList.remove(className);
@@ -508,6 +566,67 @@ export default class Sorry extends GameGui {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
+    }
+
+    jumpPawnStep(
+        pawn: HTMLElement,
+        zero: number,
+        durationMilliseconds: number,
+        startingLeft: number,
+        startingTop: number,
+        offsetLeft: number,
+        offsetTop: number,
+        timestamp: number
+    ) {
+        const elapsedMilliseconds = timestamp - zero;
+        if (elapsedMilliseconds >= durationMilliseconds) {
+            pawn.style.left = `${startingLeft + offsetLeft}px`;
+            pawn.style.top = `${startingTop + offsetTop}px`;
+            pawn.style.removeProperty('z-index');
+            return;
+        }
+
+        const elapsedFraction = elapsedMilliseconds / durationMilliseconds;
+        const easeInOutScaling = 0.5 * (Math.sin((elapsedFraction - 0.5) * Math.PI) + 1);
+        pawn.style.left = `${startingLeft + easeInOutScaling * offsetLeft}px`;
+        pawn.style.top = `${startingTop + easeInOutScaling * offsetTop}px`;
+        pawn.style.zIndex = '2';
+
+        if (elapsedFraction < 0.5) pawn.style.transform = `scale(${1 + 0.5 * easeInOutScaling}) translate3d(0, 0, ${100 * easeInOutScaling}px)`;
+        else pawn.style.transform = `scale(${1 + 0.5 * (1 - easeInOutScaling)}) translate3d(0, 0, ${100 * (1 - easeInOutScaling)}px)`;
+
+        requestAnimationFrame((timestamp) =>
+            this.jumpPawnStep(pawn, zero, durationMilliseconds, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
+        );
+    }
+
+    slidePawnStep(
+        pawn: HTMLElement,
+        zero: number,
+        durationMilliseconds: number,
+        startingLeft: number,
+        startingTop: number,
+        offsetLeft: number,
+        offsetTop: number,
+        timestamp: number
+    ) {
+        const elapsedMilliseconds = timestamp - zero;
+        if (elapsedMilliseconds >= durationMilliseconds) {
+            pawn.style.left = `${startingLeft + offsetLeft}px`;
+            pawn.style.top = `${startingTop + offsetTop}px`;
+            pawn.style.removeProperty('z-index');
+            return;
+        }
+
+        const elapsedFraction = elapsedMilliseconds / durationMilliseconds;
+        const easeInOutScaling = 0.5 * (Math.sin((elapsedFraction - 0.5) * Math.PI) + 1);
+        pawn.style.left = `${startingLeft + easeInOutScaling * offsetLeft}px`;
+        pawn.style.top = `${startingTop + easeInOutScaling * offsetTop}px`;
+        pawn.style.zIndex = '2';
+
+        requestAnimationFrame((timestamp) =>
+            this.slidePawnStep(pawn, zero, durationMilliseconds, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
+        );
     }
 }
 

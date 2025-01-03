@@ -67,9 +67,8 @@ $machinestates = [
         "description" => clienttranslate('${actplayer} must draw a card'),
         "descriptionmyturn" => clienttranslate('${you} must draw a card'),
         "type" => "activeplayer",
-        "args" => "argDrawCard",
         "possibleactions" => ["actDrawCard"],
-        "transitions" => ["nextPlayer" => States::NEXT_PLAYER, "selectPawn" => States::PLAYER_SELECT_PAWN, "zombiePass" => States::END]
+        "transitions" => ["nextPlayer" => States::NEXT_PLAYER, "selectPawn" => States::PLAYER_SELECT_PAWN, "drawAgain" => States::PLAYER_DRAW_CARD, "zombiePass" => States::END]
     ],
 
     States::PLAYER_SELECT_PAWN => [

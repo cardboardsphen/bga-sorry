@@ -113,16 +113,11 @@
     &.for-pawn-3 { background-color: orange; }
 }
 
-@keyframes selected-move-outline-pulse {
-    0% { outline-color: green; }
-    90% { outline-color: green; }
-    100% { outline-color: greenyellow; }
-}
-.selected-move {
-    outline-width: 5px;
-    outline-style:  dashed;
-    cursor: pointer;
-    animation: selected-move-outline-pulse 4s linear infinite alternate;
+.active-pawn {
+    &.for-pawn-0 { box-shadow: 0 0 10px 2px cyan; }
+    &.for-pawn-1 { box-shadow: 0 0 10px 2px fuchsia; }
+    &.for-pawn-2 { box-shadow: 0 0 10px 2px chartreuse; }
+    &.for-pawn-3 { box-shadow: 0 0 10px 2px orange; }
 }
 
 .card-pile {
