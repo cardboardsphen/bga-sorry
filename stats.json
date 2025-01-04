@@ -1,1 +1,86 @@
-{}
+{
+    "table": {
+        "numberOfTurns": {
+            "id": 10,
+            "name": "Number of turns",
+            "type": "int"
+        },
+        "percentOfPawnsAtHome": {
+            "id": 11,
+            "name": "Percent of pawns that made it to Home",
+            "type": "float"
+        },
+        "percentOfPawnsAtStart": {
+            "id": 12,
+            "name": "Percent of pawns that are still at Start",
+            "type": "float"
+        },
+        "numberOfSorrysUsed": {
+            "id": 13,
+            "name": "Number of Sorry! cards used",
+            "type": "int"
+        },
+        "totalSquaresMoved": {
+            "id": 14,
+            "name": "Total squares moved",
+            "type": "int"
+        },
+        "slidesTraveled": {
+            "id": 15,
+            "name":"Number of slides traveled",
+            "type": "int"
+        }
+    },
+    "player": {
+        "numberOfTurns": {
+            "id": 10,
+            "name": "Number of turns",
+            "type": "int"
+        },
+        "numberOfMoves": {
+            "id": 11,
+            "name": "Number of moves taken",
+            "type": "int"
+        },
+        "totalSquaresMoved": {
+            "id": 12,
+            "name": "Total squares moved",
+            "type": "int"
+        },
+        "numberOfSorrysUsed": {
+            "id": 13,
+            "name": "Number of Sorry! cards used",
+            "type": "int"
+        },
+        "timesBumpedOtherPawns": {
+            "id": 14,
+            "name":"Times you bumped other players' pawns",
+            "type": "int"
+        },
+        "timesBumped": {
+            "id": 15,
+            "name":"Times your pawns were bumped back to start",
+            "type": "int"
+        },
+        "pawnsAtHome": {
+            "id": 16,
+            "name":"Number of pawns that made it to Home",
+            "type": "int"
+        },
+        "pawnsAtStart": {
+            "id": 17,
+            "name":"Number of pawns left at Start",
+            "type": "int"
+        },
+        "pawnsBackedOutOfSafetyZone": {
+            "id": 18,
+            "name":"Times you backed out of the Safety Zone",
+            "type": "int"
+        },
+        "slidesTraveled": {
+            "id": 19,
+            "name":"Number of slides traveled",
+            "type": "int"
+        }
+    }
+}

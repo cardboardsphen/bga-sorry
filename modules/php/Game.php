@@ -268,6 +268,8 @@ class Game extends \Table {
         $this->movePawn($finalMove);
         $this->triggerClientAnimationOfDiscard();
 
+        $this->calculateMoveStats($rank, $firstMove, $finalMove);
+
         if ($this->getWinner() < 0 && $rank == '2') {
             $this->notifyAllPlayers('drawAgain', clienttranslate('${player_name} gets to draw again.'), ['player_name' => $this->getActivePlayerName()]);
             $this->gamestate->nextState('drawAgain');
@@ -278,6 +280,8 @@ class Game extends \Table {
     }
 
     public function stNextPlayer(): void {
+        $this->calculateTurnStats();
+
         $winner = $this->getWinner();
         if ($winner >= 0) {
             $this->DbQuery("UPDATE player set player_score = player_score+1 where player_id='$winner'");
@@ -437,10 +441,20 @@ class Game extends \Table {
         // Init game statistics.
         //
         // NOTE: statistics used in this file must be defined in your `stats.inc.php` file.
-
-        // Dummy content.
-        // $this->initStat("table", "table_teststat1", 0);
-        // $this->initStat("player", "player_teststat1", 0);
+        $this->initStat('table', 'numberOfTurns', 0);
+        $this->initStat('table', 'percentOfPawnsAtHome', 0);
+        $this->initStat('table', 'percentOfPawnsAtStart', 0);
+        $this->initStat('table', 'numberOfSorrysUsed', 0);
+        $this->initStat('table', 'totalSquaresMoved', 0);
+        $this->initStat('player', 'numberOfTurns', 0);
+        $this->initStat('player', 'numberOfMoves', 0);
+        $this->initStat('player', 'totalSquaresMoved', 0);
+        $this->initStat('player', 'numberOfSorrysUsed', 0);
+        $this->initStat('player', 'timesBumpedOtherPawns', 0);
+        $this->initStat('player', 'timesBumped', 0);
+        $this->initStat('player', 'pawnsAtHome', 0);
+        $this->initStat('player', 'pawnsAtStart', 0);
+        $this->initStat('player', 'pawnsBackedOutOfSafetyZone', 0);
 
         // Store four pawns in each player's home circles
         $sql = "INSERT into pawns (player, id, color, board_section, board_section_color, board_section_index) values ";
@@ -695,18 +709,21 @@ class Game extends \Table {
         if ($move->destination->section !== BoardSection::margin || $move->destination->color === $move->pawn->color || !in_array($move->destination->index, [1, 9]))
             return;
 
+        $this->incStat(1, 'slidesTraveled');
+        $this->incStat(1, 'slidesTraveled', $move->pawn->playerId);
+
         $distanceOfSlide = $move->destination->index == 1 ? 3 : 4;
         $startingIndex = intval($move->destination->index);
         $slidingPawn = Pawn::create($move->pawn->playerId, $move->pawn->id, $move->pawn->color, BoardLocation::create($move->destination->section->name, $move->destination->color->name, $move->destination->index));
-        $bumppedPawns = [];
+        $bumpedPawns = [];
         for ($i = 0; $i <= $distanceOfSlide; $i++) {
-            $bumppedPawn = $this->bumpPawnIfPresent(Move::create($slidingPawn, BoardLocation::fromPawnMove($slidingPawn, $i)), $startingIndex + $distanceOfSlide);
-            if (!is_null($bumppedPawn))
-                $bumppedPawns[] = [
+            $bumpedPawn = $this->bumpPawnIfPresent(Move::create($slidingPawn, BoardLocation::fromPawnMove($slidingPawn, $i)), $startingIndex + $distanceOfSlide);
+            if (!is_null($bumpedPawn))
+                $bumpedPawns[] = [
                     'moveType' => 'jump',
                     'durationSecondsPerSquare' => 0.4,
-                    'startMoveAtPercentage' => ($bumppedPawn->location->index - $startingIndex) * 100 / $distanceOfSlide - 35,
-                    'move' => Move::create($bumppedPawn, BoardLocation::create('start', $bumppedPawn->color->name, null))
+                    'startMoveAtPercentage' => ($bumpedPawn->location->index - $startingIndex) * 100 / $distanceOfSlide - 35,
+                    'move' => Move::create($bumpedPawn, BoardLocation::create('start', $bumpedPawn->color->name, null))
                 ];
         }
         $move->destination->index += $distanceOfSlide;
@@ -731,26 +748,28 @@ class Game extends \Table {
                 'durationSecondsPerSquare' => 0.8,
                 'move' => $move
             ],
-            ...$bumppedPawns
+            ...$bumpedPawns
         );
 
-        foreach ($bumppedPawns as $bumppedPawn)
+        foreach ($bumpedPawns as $bumpedPawn)
             $this->notifyAllPlayers(
                 'message',
-                clienttranslate('${player_name2}\'s pawn was bumpped back to Start by ${player_name}.'),
+                clienttranslate('${player_name2}\'s pawn was bumped back to Start by ${player_name}.'),
                 [
                     'player_name' => $this->getActivePlayerName(),
-                    'player_name2' => $this->getPlayerNameById($bumppedPawn['move']->pawn->playerId),
+                    'player_name2' => $this->getPlayerNameById($bumpedPawn['move']->pawn->playerId),
                 ],
             );
     }
 
     private function swapPawns(Move $move): void {
         $indexEquality = is_null($move->destination->index) ? 'is null' : "= '{$move->destination->index}'";
-        $otherPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index $indexEquality,'')");
+        $otherPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index $indexEquality");
         if ($move->pawn->location->section === BoardSection::start) {
             $this->DbQuery("UPDATE pawns set board_section = 'start', board_section_color = '$otherPawn->color', board_section_index = null where player = '$otherPawn->player' and id = '$otherPawn->id'");
             $this->DbQuery("UPDATE pawns set board_section = '$otherPawn->boardSection', board_section_color = '$otherPawn->boardSectionColor', board_section_index = '$otherPawn->boardSectionIndex' where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
+            $this->incStat(1, 'timesBumpedOtherPawns', $move->pawn->playerId);
+            $this->incStat(1, 'timesBumped', $otherPawn->player);
             $this->triggerClientAnimationOfSorry($move, Pawn::fromDb($otherPawn));
         } else {
             $this->DbQuery("UPDATE pawns set board_section = '{$move->pawn->location->section->name}', board_section_color = '{$move->pawn->location->color->name}', board_section_index = {$move->pawn->location->index} where player = '$otherPawn->player' and id = '$otherPawn->id'");
@@ -795,8 +814,8 @@ class Game extends \Table {
             ]);
         }
 
-        $bumppedPawn = $this->bumpPawnIfPresent($move);
-        if (is_null($bumppedPawn)) {
+        $bumpedPawn = $this->bumpPawnIfPresent($move);
+        if (is_null($bumpedPawn)) {
             $this->triggerClientAnimationOfPawnMoves('', [], [
                 'moveType' => 'jump',
                 'move' => $move,
@@ -805,10 +824,10 @@ class Game extends \Table {
         }
 
         $this->triggerClientAnimationOfPawnMoves(
-            clienttranslate('${player_name2}\'s pawn was bumpped back to Start by ${player_name}.'),
+            clienttranslate('${player_name2}\'s pawn was bumped back to Start by ${player_name}.'),
             [
                 'player_name' => $this->getActivePlayerName(),
-                'player_name2' => $this->getPlayerNameById($bumppedPawn->playerId),
+                'player_name2' => $this->getPlayerNameById($bumpedPawn->playerId),
             ],
             [
                 'moveType' => 'jump',
@@ -817,7 +836,7 @@ class Game extends \Table {
             [
                 'moveType' => 'jump',
                 'durationSecondsPerSquare' => 0.4,
-                'move' => Move::create($bumppedPawn, BoardLocation::create('start', $bumppedPawn->color->name, null))
+                'move' => Move::create($bumpedPawn, BoardLocation::create('start', $bumpedPawn->color->name, null))
             ]
         );
     }
@@ -853,12 +872,12 @@ class Game extends \Table {
         );
     }
 
-    private function triggerClientAnimationOfSorry(Move $move, Pawn $bumppedPawn) {
+    private function triggerClientAnimationOfSorry(Move $move, Pawn $bumpedPawn) {
         $this->triggerClientAnimationOfPawnMoves(
             clienttranslate('SORRY! ${player_name} moves out a pawn from Start and bumps ${player_name2}\'s pawn back to Start.'),
             [
                 'player_name' => $this->getActivePlayerName(),
-                'player_name2' => $this->getPlayerNameById($bumppedPawn->playerId),
+                'player_name2' => $this->getPlayerNameById($bumpedPawn->playerId),
             ],
             [
                 'moveType' => 'jump',
@@ -869,7 +888,7 @@ class Game extends \Table {
                 'moveType' => 'jump',
                 'durationSecondsPerSquare' => 0.25,
                 'startMoveAtPercentage' => 80,
-                'move' => Move::create($bumppedPawn, BoardLocation::create('start', $bumppedPawn->color->name, null))
+                'move' => Move::create($bumpedPawn, BoardLocation::create('start', $bumpedPawn->color->name, null))
             ]
         );
     }
@@ -896,14 +915,17 @@ class Game extends \Table {
 
     private function bumpPawnIfPresent(Move $move, int $slidingTo = null): ?Pawn {
         $indexEquality = is_null($move->destination->index) ? 'is null' : "= '{$move->destination->index}'";
-        $bumppedPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where (player != '{$move->pawn->playerId}' or id != '{$move->pawn->id}') and board_section != 'home' and board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index $indexEquality");
-        if (!isset($bumppedPawn->player))
+        $bumpedPawn = self::getFirstRowFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns where (player != '{$move->pawn->playerId}' or id != '{$move->pawn->id}') and board_section != 'home' and board_section = '{$move->destination->section->name}' and board_section_color = '{$move->destination->color->name}' and board_section_index $indexEquality");
+        if (!isset($bumpedPawn->player))
             return null;
 
-        if ($bumppedPawn->player == $move->pawn->playerId) {
-            $finalMove = self::getFirstRowFromDb("SELECT id, destination_section, destination_section_color, destination_section_index from possible_moves where pawn_id = '{$bumppedPawn->id}' and selected_as = 'final_move'");
+        $this->incStat(1, 'timesBumpedOtherPawns', $move->pawn->playerId);
+        $this->incStat(1, 'timesBumped', $bumpedPawn->player);
+
+        if ($bumpedPawn->player == $move->pawn->playerId) {
+            $finalMove = self::getFirstRowFromDb("SELECT id, destination_section, destination_section_color, destination_section_index from possible_moves where pawn_id = '{$bumpedPawn->id}' and selected_as = 'final_move'");
             if (isset($finalMove->id)) {
-                // the bumpped pawn is going to move
+                // the bumped pawn is going to move
                 if (is_null($slidingTo))
                     return null; // it'll move out of the way
 
@@ -911,13 +933,13 @@ class Game extends \Table {
                 if ($finalMove->destinationSection != $move->destination->section->name || $finalMove->destinationSectionColor != $move->destination->color->name || $finalMove->destinationSectionIndex > $slidingTo)
                     return null;
 
-                // final pawn is getting bumpped; don't move it later
+                // final pawn is getting bumped; don't move it later
                 $this->DbQuery("UPDATE possible_moves set selected_as = 'blocked' where selected_as = 'final_move'");
             }
         }
 
-        $this->DbQuery("UPDATE pawns set board_section = 'start', board_section_color = '$bumppedPawn->color', board_section_index = null where player = '$bumppedPawn->player' and id = '$bumppedPawn->id'");
-        return Pawn::fromDb($bumppedPawn);
+        $this->DbQuery("UPDATE pawns set board_section = 'start', board_section_color = '$bumpedPawn->color', board_section_index = null where player = '$bumpedPawn->player' and id = '$bumpedPawn->id'");
+        return Pawn::fromDb($bumpedPawn);
     }
 
     private function getSelectedMove(): ?array {
@@ -960,6 +982,45 @@ class Game extends \Table {
         $this->notifyAllPlayers('message', clienttranslate('${player_name} skips their turn.'), ['player_name' => $player]);
         $this->triggerClientAnimationOfDiscard();
         $this->gamestate->nextState('skipTurn');
+    }
+
+    private function calculateMoveStats(string $rank, ?Move $firstMove, ?Move $finalMove) {
+        $playerId = intval($this->getActivePlayerId());
+
+        $move = $finalMove ?? $firstMove;
+        if (is_null($move))
+            throw new BgaUserException('no move');
+
+        $this->incStat(1, 'numberOfMoves', $playerId);
+
+        if ($rank == 'sorry') {
+            $this->incStat(1, 'numberOfSorrysUsed');
+            $this->incStat(1, 'numberOfSorrysUsed', $playerId);
+            return;
+        }
+
+        $numberOfSquaresMoved = (is_null($finalMove) ? 0 : abs($finalMove?->numberOfSteps)) + (is_null($firstMove) ? 0 : abs($firstMove?->numberOfSteps));
+        $this->incStat($numberOfSquaresMoved, 'totalSquaresMoved');
+        $this->incStat($numberOfSquaresMoved, 'totalSquaresMoved', $playerId);
+
+        if ($move->numberOfSteps < 0 && $move->pawn->location->section === BoardSection::safety && $move->destination->section !== BoardSection::safety)
+            $this->incStat(1, 'pawnsBackedOutOfSafetyZone', $playerId);
+    }
+
+    private function calculateTurnStats(): void {
+        $playerId = intval($this->getActivePlayerId());
+        $this->incStat(1, 'numberOfTurns');
+        $this->incStat(1, 'numberOfTurns', $playerId);
+
+        $pawnsAtHome = self::getFirstRowFromDb("SELECT sum(board_section = 'home')/count(id)*100 as percentage from pawns")->percentage;
+        $pawnsAtStart = self::getFirstRowFromDb("SELECT sum(board_section = 'start')/count(id)*100 as percentage from pawns")->percentage;
+        $this->setStat($pawnsAtHome, 'percentOfPawnsAtHome');
+        $this->setStat($pawnsAtStart, 'percentOfPawnsAtStart');
+
+        $playerPawnsAtHome = self::getFirstRowFromDb("SELECT sum(board_section = 'home') as count from pawns where player = '$playerId'")->count;
+        $playerPawnsAtStart = self::getFirstRowFromDb("SELECT sum(board_section = 'start') as count from pawns where player = '$playerId'")->count;
+        $this->setStat($playerPawnsAtHome, 'pawnsAtHome', $playerId);
+        $this->setStat($playerPawnsAtStart, 'pawnsAtStart', $playerId);
     }
 
     private function getWinner(): int {

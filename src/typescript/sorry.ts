@@ -335,7 +335,7 @@ export default class Sorry extends GameGui {
         const easeInOutScaling = 0.56815808768082454 * Math.sin((0.7 * elapsedFraction - 0.3) * Math.PI) + 0.45964954842535866;
         move.pawn.style.left = `${move.startingLeft + easeInOutScaling * move.offsetLeft}px`;
         move.pawn.style.top = `${move.startingTop + easeInOutScaling * move.offsetTop}px`;
-        move.pawn.style.zIndex = '2';
+        move.pawn.style.zIndex = '4';
 
         if (move.moveType === 'jump') {
             if (elapsedFraction < 0.5)
