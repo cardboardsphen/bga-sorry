@@ -200,6 +200,7 @@
     position: absolute;
     transform: rotate(-90deg);
     transform-origin: top left;
+    z-index: 3;
 
     .card {
         backface-visibility: hidden;

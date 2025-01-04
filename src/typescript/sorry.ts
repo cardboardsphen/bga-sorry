@@ -22,6 +22,7 @@ import 'dojo';
 import 'dojo/_base/declare';
 import 'ebg/counter';
 import * as GameGui from 'ebg/core/gamegui';
+import {StyleType, StyleQueue} from './StyleQueue';
 
 /**
  * Client implementation of Sorry.
@@ -40,11 +41,7 @@ export default class Sorry extends GameGui {
         console.log('Starting game setup');
 
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                console.debug('The page is visible again!');
-            } else {
-                console.debug('The page is hidden.');
-            }
+            if (document.visibilityState === 'visible') setTimeout(() => this.styleQueue.dequeueAllAndApply(), 500); // wait a tick for animations to wrap up
         });
 
         this.addBoardPieces(gamedatas);
@@ -201,8 +198,7 @@ export default class Sorry extends GameGui {
             card.classList.add('revealing');
             await this.wait(2000); // return early so card is logged about when it is revealed
         } else {
-            console.debug('visiblityState', document.visibilityState);
-            card.classList.add('revealed');
+            this.styleQueue.applyOrEnqueue(StyleType.ClassAdd, 'reveal-card', 'revealed');
         }
     }
 
@@ -217,10 +213,9 @@ export default class Sorry extends GameGui {
             card.classList.add('discarding');
             await this.wait(2000);
         } else {
-            console.debug('visiblityState', document.visibilityState);
-            document.getElementById('discard-card')!.dataset['rank'] = args.rank;
-            document.getElementById('discard-card')!.classList.remove('hidden');
-            card.classList.add('hidden');
+            this.styleQueue.applyOrEnqueue(StyleType.SetData, 'discard-card', 'rank', args.rank);
+            this.styleQueue.applyOrEnqueue(StyleType.ClassRemove, 'discard-card', 'hidden');
+            this.styleQueue.applyOrEnqueue(StyleType.ClassAdd, 'reveal-card', 'hidden');
         }
     }
 
@@ -229,9 +224,8 @@ export default class Sorry extends GameGui {
         document.getElementById('reveal-card')!.classList.add('hidden');
 
         if (!this.bgaAnimationsActive()) {
-            console.debug('visiblityState', document.visibilityState);
-            document.getElementById('draw-card')!.classList.remove('hidden');
-            document.getElementById('discard-card')!.classList.add('hidden');
+            this.styleQueue.applyOrEnqueue(StyleType.ClassRemove, 'draw-card', 'hidden');
+            this.styleQueue.applyOrEnqueue(StyleType.ClassAdd, 'discard-card', 'hidden');
             return;
         }
 
@@ -259,49 +253,30 @@ export default class Sorry extends GameGui {
         this.clearPossibleMoves();
 
         if (!this.bgaAnimationsActive()) {
-            console.debug('visiblityState', document.visibilityState);
-            const pawn = document.getElementById(`pawn-${args.move.playerId}-${args.move.pawnId}`)!;
+            const pawnId = `pawn-${args.move.playerId}-${args.move.pawnId}`;
             const [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
                 args.move.section,
                 args.move.color,
                 args.move.index,
                 args.move.id
             );
-            console.debug(
-                'Setting pawn to destination without animation: from ',
-                pawn.style.left,
-                pawn.style.top,
-                'to ',
-                pawnDestinationLeft,
-                pawnDestinationTop
-            );
-            pawn.style.left = `${pawnDestinationLeft}px`;
-            pawn.style.top = `${pawnDestinationTop}px`;
-
-            // Force reflow
-            pawn.offsetWidth;
+            this.styleQueue.applyOrEnqueue(StyleType.Style, pawnId, 'left', `${pawnDestinationLeft}px`);
+            this.styleQueue.applyOrEnqueue(StyleType.Style, pawnId, 'top', `${pawnDestinationTop}px`);
+            this.styleQueue.applyOrEnqueue(StyleType.StyleRemove, pawnId, 'transform');
+            this.styleQueue.applyOrEnqueue(StyleType.StyleRemove, pawnId, 'z-index');
 
             for (let otherMove of args.otherMoves) {
-                const otherPawn = document.getElementById(`pawn-${otherMove.playerId}-${otherMove.pawnId}`)!;
+                const otherPawnId = `pawn-${otherMove.playerId}-${otherMove.pawnId}`;
                 const [otherPawnDestinationLeft, otherPawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
                     otherMove.section,
                     otherMove.color,
                     otherMove.index,
                     otherMove.id
                 );
-                console.debug(
-                    'Setting other pawn to destination without animation: from ',
-                    otherPawn.style.left,
-                    otherPawn.style.top,
-                    'to ',
-                    otherPawnDestinationLeft,
-                    otherPawnDestinationTop
-                );
-                otherPawn.style.left = `${otherPawnDestinationLeft}px`;
-                otherPawn.style.top = `${otherPawnDestinationTop}px`;
-
-                // Force reflow
-                otherPawn.offsetWidth;
+                this.styleQueue.applyOrEnqueue(StyleType.Style, otherPawnId, 'left', `${otherPawnDestinationLeft}px`);
+                this.styleQueue.applyOrEnqueue(StyleType.Style, otherPawnId, 'top', `${otherPawnDestinationTop}px`);
+                this.styleQueue.applyOrEnqueue(StyleType.StyleRemove, otherPawnId, 'transform');
+                this.styleQueue.applyOrEnqueue(StyleType.StyleRemove, otherPawnId, 'z-index');
             }
             return;
         }
