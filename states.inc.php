@@ -78,7 +78,7 @@ $machinestates = [
         "type" => "activeplayer",
         "args" => "argSelectPawn",
         "possibleactions" => ["actSelectPawn", "actUndoSelection"],
-        "transitions" => ["nextPlayer" => States::NEXT_PLAYER, "movePawn" => States::MOVE_PAWN, "selectSquare" => States::PLAYER_SELECT_SQUARE]
+        "transitions" => ["skipTurn" => States::NEXT_PLAYER, "selectPawn" => States::PLAYER_SELECT_PAWN, "selectSquare" => States::PLAYER_SELECT_SQUARE, "movePawn" => States::MOVE_PAWN]
     ],
 
     States::PLAYER_SELECT_SQUARE => [
@@ -88,7 +88,7 @@ $machinestates = [
         "type" => "activeplayer",
         "args" => "argSelectSquare",
         "possibleactions" => ["actSelectSquare", "actUndoSelection"],
-        "transitions" => ["movePawn" => States::MOVE_PAWN, "selectPawn" => States::PLAYER_SELECT_PAWN, "zombiePass" => States::END]
+        "transitions" => ["skipTurn" => States::NEXT_PLAYER, "movePawn" => States::MOVE_PAWN, "selectPawn" => States::PLAYER_SELECT_PAWN]
     ],
 
     States::MOVE_PAWN => [

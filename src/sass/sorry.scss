@@ -120,6 +120,12 @@
     &.for-pawn-3 { box-shadow: 0 0 10px 2px orange; }
 }
 
+.selected-move {
+    outline-width: 8px;
+    outline-style:  dashed;
+    outline-color: black;
+}
+
 .card-pile {
     position: absolute;
     width: 150px;

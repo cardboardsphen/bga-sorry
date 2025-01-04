@@ -29,6 +29,7 @@ import * as GameGui from 'ebg/core/gamegui';
 export default class Sorry extends GameGui {
     // enable dynamic method calls
     [key: string]: any;
+    styleQueue = new StyleQueue();
 
     constructor() {
         super();
@@ -37,6 +38,14 @@ export default class Sorry extends GameGui {
 
     override setup(gamedatas: BGA.Gamedatas | any): void {
         console.log('Starting game setup');
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                console.debug('The page is visible again!');
+            } else {
+                console.debug('The page is hidden.');
+            }
+        });
 
         this.addBoardPieces(gamedatas);
         this.placeBoardPieces(gamedatas.pawns, gamedatas.cards);
@@ -108,6 +117,13 @@ export default class Sorry extends GameGui {
                     locationElement.classList.add(`for-pawn-${pawnId}`);
                 }
             }
+
+            if (args.args.selectedMove) {
+                document.getElementById(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
+                document
+                    .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
+                    .classList.add('selected-move');
+            }
         }
     }
 
@@ -142,6 +158,13 @@ export default class Sorry extends GameGui {
                     document.getElementById(locationId)!.classList.add('possible-move', `for-pawn-${pawnId}`);
                 }
             }
+
+            if (args.args.selectedMove) {
+                document.getElementById(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
+                document
+                    .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
+                    .classList.add('selected-move');
+            }
         }
     }
 
@@ -152,8 +175,8 @@ export default class Sorry extends GameGui {
 
         if (args.canSkip)
             this.addActionButton('skip-turn-btn', 'Skip Turn', () =>
-                this.bgaPerformAction('actSelectPawn', {
-                    pawnId: -1,
+                this.bgaPerformAction('actSelectSquare', {
+                    squareId: -1,
                 })
             );
 
@@ -171,10 +194,16 @@ export default class Sorry extends GameGui {
         cardFront.dataset['rank'] = args.rank;
 
         card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
-        card.classList.add('revealing');
-
         if (args.hasMoreToDraw) document.getElementById('draw-card')!.classList.remove('hidden');
         else document.getElementById('draw-card')!.classList.add('hidden');
+
+        if (this.bgaAnimationsActive()) {
+            card.classList.add('revealing');
+            await this.wait(2000); // return early so card is logged about when it is revealed
+        } else {
+            console.debug('visiblityState', document.visibilityState);
+            card.classList.add('revealed');
+        }
     }
 
     async notification_discardCard(args: any): Promise<void> {
@@ -183,61 +212,184 @@ export default class Sorry extends GameGui {
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
-        if (card.classList.contains('revealing') || card.classList.contains('revealed')) {
+        if (this.bgaAnimationsActive() && (card.classList.contains('revealing') || card.classList.contains('revealed'))) {
             card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
             card.classList.add('discarding');
+            await this.wait(2000);
         } else {
+            console.debug('visiblityState', document.visibilityState);
             document.getElementById('discard-card')!.dataset['rank'] = args.rank;
             document.getElementById('discard-card')!.classList.remove('hidden');
+            card.classList.add('hidden');
         }
     }
 
     async notification_shuffleDeck(args: any): Promise<void> {
         console.log('Received notification: shuffleDeck');
-        this.shuffleCards(args.rank);
+        document.getElementById('reveal-card')!.classList.add('hidden');
+
+        if (!this.bgaAnimationsActive()) {
+            console.debug('visiblityState', document.visibilityState);
+            document.getElementById('draw-card')!.classList.remove('hidden');
+            document.getElementById('discard-card')!.classList.add('hidden');
+            return;
+        }
+
+        const shuffleCards = document.getElementById('shuffle-cards')!;
+        let ranks = ['1', '2', '3', '4', '5', '7', '8', '10', '11', '12', 'sorry'];
+        ranks = ranks.filter((r) => r != args.rank);
+        this.shuffleArray(ranks);
+        ranks.push(args.rank);
+
+        let i = 0;
+        shuffleCards.querySelectorAll('.card.front').forEach((card) => {
+            let cardFront = card as HTMLElement;
+            cardFront.dataset['rank'] = ranks[i];
+            i++;
+        });
+        shuffleCards.classList.add('shuffling');
+        shuffleCards.classList.remove('hidden');
+
+        document.getElementById('discard-card')!.classList.add('hidden');
+        await this.wait(3000);
     }
 
     async notification_movePawns(args: any): Promise<void> {
-        console.log('Received notification: jumpPawn');
+        console.log('Received notification: movePawns');
         this.clearPossibleMoves();
-        const pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
-        const pawn = document.getElementById(pawnElementId)!;
-        const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
-        const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
 
-        const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, args.pawnId, args.section, args.color, args.index);
         if (!this.bgaAnimationsActive()) {
-            pawn.style.left = `${startingLeft + offsetLeft}px`;
-            pawn.style.top = `${startingTop + offsetTop}px`;
+            console.debug('visiblityState', document.visibilityState);
+            const pawn = document.getElementById(`pawn-${args.move.playerId}-${args.move.pawnId}`)!;
+            const [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
+                args.move.section,
+                args.move.color,
+                args.move.index,
+                args.move.id
+            );
+            console.debug(
+                'Setting pawn to destination without animation: from ',
+                pawn.style.left,
+                pawn.style.top,
+                'to ',
+                pawnDestinationLeft,
+                pawnDestinationTop
+            );
+            pawn.style.left = `${pawnDestinationLeft}px`;
+            pawn.style.top = `${pawnDestinationTop}px`;
+
+            // Force reflow
+            pawn.offsetWidth;
+
+            for (let otherMove of args.otherMoves) {
+                const otherPawn = document.getElementById(`pawn-${otherMove.playerId}-${otherMove.pawnId}`)!;
+                const [otherPawnDestinationLeft, otherPawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
+                    otherMove.section,
+                    otherMove.color,
+                    otherMove.index,
+                    otherMove.id
+                );
+                console.debug(
+                    'Setting other pawn to destination without animation: from ',
+                    otherPawn.style.left,
+                    otherPawn.style.top,
+                    'to ',
+                    otherPawnDestinationLeft,
+                    otherPawnDestinationTop
+                );
+                otherPawn.style.left = `${otherPawnDestinationLeft}px`;
+                otherPawn.style.top = `${otherPawnDestinationTop}px`;
+
+                // Force reflow
+                otherPawn.offsetWidth;
+            }
             return;
         }
 
-        const distance = Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50;
-        const duration = 1000 * distance;
-        requestAnimationFrame((timestamp) =>
-            this.jumpPawnStep(pawn, document.timeline.currentTime as number, duration, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
+        const move = this.getMoveFromMoveArgs(args.move);
+        const otherMoves = args.otherMoves.map((otherMoveArgs: any) => this.getMoveFromMoveArgs(otherMoveArgs));
+
+        const otherDurations = otherMoves.map(
+            (otherMove: any) => otherMove.durationMilliseconds + (otherMove.startMoveAtPercentage * move.durationMilliseconds) / 100
         );
-        await this.wait(duration);
+        const overallDuration = Math.max(move.durationMilliseconds, ...otherDurations);
+
+        requestAnimationFrame((timestamp) => this.movePawnStep(document.timeline.currentTime as number, move, otherMoves, timestamp));
+        await this.wait(overallDuration);
     }
 
-    async notification_slidePawn(args: any): Promise<void> {
-        console.log('Received notification: slidePawn');
-        const pawnElementId = `pawn-${args.playerId}-${args.pawnId}`;
-        const pawn = document.getElementById(pawnElementId)!;
-        const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
-        const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
-
-        const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, args.pawnId, args.section, args.color, args.index);
-        if (!this.bgaAnimationsActive()) {
-            pawn.style.left = `${startingLeft + offsetLeft}px`;
-            pawn.style.top = `${startingTop + offsetTop}px`;
+    movePawnStep(
+        zero: number,
+        move: {
+            pawn: HTMLElement;
+            moveType: string;
+            durationMilliseconds: number;
+            startMoveAtPercentage: number;
+            startingLeft: number;
+            startingTop: number;
+            offsetLeft: number;
+            offsetTop: number;
+        },
+        otherMoves: Array<{
+            pawn: HTMLElement;
+            moveType: string;
+            durationMilliseconds: number;
+            startMoveAtPercentage: number;
+            startingLeft: number;
+            startingTop: number;
+            offsetLeft: number;
+            offsetTop: number;
+        }>,
+        timestamp: number
+    ) {
+        const elapsedMilliseconds = timestamp - zero;
+        if (elapsedMilliseconds >= move.durationMilliseconds) {
+            move.pawn.style.left = `${move.startingLeft + move.offsetLeft}px`;
+            move.pawn.style.top = `${move.startingTop + move.offsetTop}px`;
+            move.pawn.style.removeProperty('z-index');
             return;
         }
 
-        const duration = 2000;
-        requestAnimationFrame((timestamp) =>
-            this.slidePawnStep(pawn, document.timeline.currentTime as number, duration, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
-        );
+        const elapsedFraction = elapsedMilliseconds / move.durationMilliseconds;
+        for (let otherMove of [...otherMoves]) {
+            if (elapsedFraction >= otherMove.startMoveAtPercentage / 100) {
+                otherMoves.splice(otherMoves.indexOf(otherMove), 1);
+                requestAnimationFrame((timestamp) => this.movePawnStep(document.timeline.currentTime as number, otherMove, [], timestamp));
+            }
+        }
+        const easeInOutScaling = 0.56815808768082454 * Math.sin((0.7 * elapsedFraction - 0.3) * Math.PI) + 0.45964954842535866;
+        move.pawn.style.left = `${move.startingLeft + easeInOutScaling * move.offsetLeft}px`;
+        move.pawn.style.top = `${move.startingTop + easeInOutScaling * move.offsetTop}px`;
+        move.pawn.style.zIndex = '2';
+
+        if (move.moveType === 'jump') {
+            if (elapsedFraction < 0.5)
+                move.pawn.style.transform = `scale(${1 + 0.5 * easeInOutScaling}) translate3d(0, 0, ${100 * easeInOutScaling}px)`;
+            else move.pawn.style.transform = `scale(${1 + 0.5 * (1 - easeInOutScaling)}) translate3d(0, 0, ${100 * (1 - easeInOutScaling)}px)`;
+        }
+
+        requestAnimationFrame((timestamp) => this.movePawnStep(zero, move, otherMoves, timestamp));
+    }
+
+    getMoveFromMoveArgs(move: any): any {
+        const pawn = document.getElementById(`pawn-${move.playerId}-${move.pawnId}`)!;
+        const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
+        const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
+
+        const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, move.pawnId, move.section, move.color, move.index);
+
+        const distance = Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50;
+        const duration = parseFloat(move.durationSecondsPerSquare) * 1000 * distance;
+        return {
+            pawn: pawn,
+            moveType: move.moveType,
+            durationMilliseconds: duration,
+            startMoveAtPercentage: parseInt(move.startMoveAtPercentage ?? 0),
+            startingLeft: startingLeft,
+            startingTop: startingTop,
+            offsetLeft: offsetLeft,
+            offsetTop: offsetTop,
+        };
     }
 
     async notification_swapPawns(args: any): Promise<void> {
@@ -352,8 +504,8 @@ export default class Sorry extends GameGui {
                 <div class="card front"></div>
             </div>`
         );
-        document.getElementById('reveal-card')!.addEventListener('animationend', this.revealCardAnmiationStopped.bind(this));
-        document.getElementById('reveal-card')!.addEventListener('animationcancel', this.revealCardAnmiationStopped.bind(this));
+        document.getElementById('reveal-card')!.addEventListener('animationend', this.revealCardAnimationStopped.bind(this));
+        document.getElementById('reveal-card')!.addEventListener('animationcancel', this.revealCardAnimationStopped.bind(this));
 
         board.insertAdjacentHTML('beforeend', `<div id="shuffle-cards" class="card-pile hidden"></div>`);
         for (let rank of [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 'sorry']) {
@@ -450,7 +602,7 @@ export default class Sorry extends GameGui {
         return destinationId;
     }
 
-    revealCardAnmiationStopped(e: AnimationEvent): void {
+    revealCardAnimationStopped(e: AnimationEvent): void {
         let card = e.currentTarget as HTMLElement;
         if (card.classList.contains('revealing')) {
             document.getElementById('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
@@ -480,7 +632,7 @@ export default class Sorry extends GameGui {
      * @param pawnId The id of the pawn to be placed at the position. This can be omitted if the pawn is not at start or home.
      * @returns An array of the form [left, top]. The values are strings which can be used as CSS values.
      */
-    getPawnCoorinatesInPixelsAtLocation(section: string, sectionColor: string, sectionIndex: string, pawnId: number = 0): [number, number] {
+    getPawnCoorinatesInPixelsAtLocation(section: string, sectionColor: string, sectionIndex: string, pawnId: number): [number, number] {
         let locationId = this.getLocationId(section, sectionColor, sectionIndex === null ? null : parseInt(sectionIndex));
         let boardLocationStyle = window.getComputedStyle(document.getElementById(locationId)!);
         let locationLeft = this.parseDimensionToPx(boardLocationStyle.left);
@@ -540,93 +692,11 @@ export default class Sorry extends GameGui {
         });
     }
 
-    shuffleCards(rank: string): void {
-        document.getElementById('reveal-card')!.classList.add('hidden');
-
-        const shuffleCards = document.getElementById('shuffle-cards')!;
-        let ranks = ['1', '2', '3', '4', '5', '7', '8', '10', '11', '12', 'sorry'];
-        ranks = ranks.filter((r) => r !== rank);
-        this.shuffleArray(ranks);
-        ranks.push(rank);
-
-        let i = 0;
-        shuffleCards.querySelectorAll('.card.front').forEach((card) => {
-            let cardFront = card as HTMLElement;
-            cardFront.dataset['rank'] = ranks[i];
-            i++;
-        });
-        shuffleCards.classList.add('shuffling');
-        shuffleCards.classList.remove('hidden');
-
-        document.getElementById('discard-card')!.classList.add('hidden');
-    }
-
     shuffleArray(array: any[]): void {
         for (let i = array.length - 1; i >= 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
-    }
-
-    jumpPawnStep(
-        pawn: HTMLElement,
-        zero: number,
-        durationMilliseconds: number,
-        startingLeft: number,
-        startingTop: number,
-        offsetLeft: number,
-        offsetTop: number,
-        timestamp: number
-    ) {
-        const elapsedMilliseconds = timestamp - zero;
-        if (elapsedMilliseconds >= durationMilliseconds) {
-            pawn.style.left = `${startingLeft + offsetLeft}px`;
-            pawn.style.top = `${startingTop + offsetTop}px`;
-            pawn.style.removeProperty('z-index');
-            return;
-        }
-
-        const elapsedFraction = elapsedMilliseconds / durationMilliseconds;
-        const easeInOutScaling = 0.5 * (Math.sin((elapsedFraction - 0.5) * Math.PI) + 1);
-        pawn.style.left = `${startingLeft + easeInOutScaling * offsetLeft}px`;
-        pawn.style.top = `${startingTop + easeInOutScaling * offsetTop}px`;
-        pawn.style.zIndex = '2';
-
-        if (elapsedFraction < 0.5) pawn.style.transform = `scale(${1 + 0.5 * easeInOutScaling}) translate3d(0, 0, ${100 * easeInOutScaling}px)`;
-        else pawn.style.transform = `scale(${1 + 0.5 * (1 - easeInOutScaling)}) translate3d(0, 0, ${100 * (1 - easeInOutScaling)}px)`;
-
-        requestAnimationFrame((timestamp) =>
-            this.jumpPawnStep(pawn, zero, durationMilliseconds, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
-        );
-    }
-
-    slidePawnStep(
-        pawn: HTMLElement,
-        zero: number,
-        durationMilliseconds: number,
-        startingLeft: number,
-        startingTop: number,
-        offsetLeft: number,
-        offsetTop: number,
-        timestamp: number
-    ) {
-        const elapsedMilliseconds = timestamp - zero;
-        if (elapsedMilliseconds >= durationMilliseconds) {
-            pawn.style.left = `${startingLeft + offsetLeft}px`;
-            pawn.style.top = `${startingTop + offsetTop}px`;
-            pawn.style.removeProperty('z-index');
-            return;
-        }
-
-        const elapsedFraction = elapsedMilliseconds / durationMilliseconds;
-        const easeInOutScaling = 0.5 * (Math.sin((elapsedFraction - 0.5) * Math.PI) + 1);
-        pawn.style.left = `${startingLeft + easeInOutScaling * offsetLeft}px`;
-        pawn.style.top = `${startingTop + easeInOutScaling * offsetTop}px`;
-        pawn.style.zIndex = '2';
-
-        requestAnimationFrame((timestamp) =>
-            this.slidePawnStep(pawn, zero, durationMilliseconds, startingLeft, startingTop, offsetLeft, offsetTop, timestamp)
-        );
     }
 }
 
