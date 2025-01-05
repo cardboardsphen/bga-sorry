@@ -23,11 +23,14 @@ namespace Bga\Games\Sorry;
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 require_once("autoload.php");
 
-use Bga\Games\Sorry\Helpers\DatabaseHelpers;
-use Bga\Games\Sorry\Models\{Pawn, Move};
-use Bga\Games\Sorry\Models\Board\{BoardLocation, BoardSection, BoardColor};
-use BgaUserException;
-use stdClass;
+use \stdClass;
+
+use \Bga\GameFramework\Actions\CheckAction;
+use \BgaUserException;
+
+use \Bga\Games\Sorry\Helpers\DatabaseHelpers;
+use \Bga\Games\Sorry\Models\{Pawn, Move};
+use \Bga\Games\Sorry\Models\Board\{BoardLocation, BoardSection, BoardColor};
 
 class Game extends \Table {
     use DatabaseHelpers;
@@ -96,7 +99,7 @@ class Game extends \Table {
             'color' => $playerColor,
             'cardRank' => $rank,
             'cardDescription' => CARD_DESCRIPTIONS[$rank],
-            'selectMove' => $this->getSelectedMove(),
+            'selectedMove' => $this->getSelectedMove(),
             'possibleMoves' => $this->groupPossibleMoves($possibleMoves),
             'canSkip' => $canSkip,
         ];
@@ -242,6 +245,30 @@ class Game extends \Table {
         $this->gamestate->nextState('selectPawn');
     }
 
+    #[CheckAction(false)]
+    public function actRedraw(): void {
+        $result = [];
+
+        // Get pawn locations
+        $result['pawns'] = self::getRowsFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns");
+
+        // Get card information
+        $result['cards'] = [];
+        $result['cards']['nextCard'] = self::getFirstRowFromDb("SELECT min(id) as id from cards where pile = 'draw'")->id;
+
+        $topDiscards = self::getRowsFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 2");
+        if (in_array($this->gamestate->state()['name'], ['selectPawn', 'selectSquare'])) {
+            $result['cards']['revealCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
+            $result['cards']['lastCard'] = count($topDiscards) > 1 ? $topDiscards[1]->rank : null;
+        } else {
+            $result['cards']['lastCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
+        }
+
+        $result['version'] = $this->getGameStateValue('game_db_version');
+
+        $this->notifyPlayer($this->getCurrentPlayerId(), 'redraw', '', $result);
+    }
+
     /**
      * Game state actions
      */
@@ -377,8 +404,6 @@ class Game extends \Table {
             $result['cards']['lastCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
         }
 
-        $result['selectedMove'] = $this->getSelectedMove();
-
         $result['version'] = $this->getGameStateValue('game_db_version');
 
         return $result;
@@ -455,6 +480,7 @@ class Game extends \Table {
         $this->initStat('player', 'pawnsAtHome', 0);
         $this->initStat('player', 'pawnsAtStart', 0);
         $this->initStat('player', 'pawnsBackedOutOfSafetyZone', 0);
+        $this->initStat('player', 'timesBumpedOwnPawns', 0);
 
         // Store four pawns in each player's home circles
         $sql = "INSERT into pawns (player, id, color, board_section, board_section_color, board_section_index) values ";
@@ -919,7 +945,10 @@ class Game extends \Table {
         if (!isset($bumpedPawn->player))
             return null;
 
-        $this->incStat(1, 'timesBumpedOtherPawns', $move->pawn->playerId);
+        if ($move->pawn->playerId == $bumpedPawn->player)
+            $this->incStat(1, 'timesBumpedOwnPawns', $move->pawn->playerId);
+        else
+            $this->incStat(1, 'timesBumpedOtherPawns', $move->pawn->playerId);
         $this->incStat(1, 'timesBumped', $bumpedPawn->player);
 
         if ($bumpedPawn->player == $move->pawn->playerId) {

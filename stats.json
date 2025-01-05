@@ -62,6 +62,11 @@
             "name":"Times your pawns were bumped back to start",
             "type": "int"
         },
+        "timesBumpedOwnPawns": {
+            "id": 20,
+            "name":"Times you bumped your own pawns back to start",
+            "type": "int"
+        },
         "pawnsAtHome": {
             "id": 16,
             "name":"Number of pawns that made it to Home",
