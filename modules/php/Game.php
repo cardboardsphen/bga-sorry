@@ -836,6 +836,7 @@ class Game extends \Table {
             $incrementalLocation = BoardLocation::fromPawnMove($move->pawn, $step + $i);
             $this->triggerClientAnimationOfPawnMoves('', [], [
                 'moveType' => 'jump',
+                'durationSecondsPerSquare' => 0.6,
                 'move' => Move::create($move->pawn, $incrementalLocation)
             ]);
         }
@@ -844,6 +845,7 @@ class Game extends \Table {
         if (is_null($bumpedPawn)) {
             $this->triggerClientAnimationOfPawnMoves('', [], [
                 'moveType' => 'jump',
+                'durationSecondsPerSquare' => 0.7,
                 'move' => $move,
             ]);
             return;
@@ -857,6 +859,7 @@ class Game extends \Table {
             ],
             [
                 'moveType' => 'jump',
+                'durationSecondsPerSquare' => 0.7,
                 'move' => $move
             ],
             [
