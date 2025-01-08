@@ -274,10 +274,9 @@ export default class Sorry extends GameGui {
             });
     }
 
-    async notification_redraw(args: any): Promise<void> {
-        throw new Error('badd');
-        console.log('Received notification: redraw');
-        this.placeBoardPieces(args.pawns, args.cards);
+    async notification_score(args: any): Promise<void> {
+        console.log('Received notification: score');
+        this.scoreCtrl[args.playerId]!.setValue(args.score);
     }
 
     ///////////////////////////////////////////////////

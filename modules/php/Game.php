@@ -245,30 +245,6 @@ class Game extends \Table {
         $this->gamestate->nextState('selectPawn');
     }
 
-    #[CheckAction(false)]
-    public function actRedraw(): void {
-        $result = [];
-
-        // Get pawn locations
-        $result['pawns'] = self::getRowsFromDb("SELECT player, id, color, board_section, board_section_color, board_section_index from pawns");
-
-        // Get card information
-        $result['cards'] = [];
-        $result['cards']['nextCard'] = self::getFirstRowFromDb("SELECT min(id) as id from cards where pile = 'draw'")->id;
-
-        $topDiscards = self::getRowsFromDb("SELECT rank from cards where pile = 'discard' order by position desc limit 2");
-        if (in_array($this->gamestate->state()['name'], ['selectPawn', 'selectSquare'])) {
-            $result['cards']['revealCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
-            $result['cards']['lastCard'] = count($topDiscards) > 1 ? $topDiscards[1]->rank : null;
-        } else {
-            $result['cards']['lastCard'] = count($topDiscards) > 0 ? $topDiscards[0]->rank : null;
-        }
-
-        $result['version'] = $this->getGameStateValue('game_db_version');
-
-        $this->notifyPlayer($this->getCurrentPlayerId(), 'redraw', '', $result);
-    }
-
     /**
      * Game state actions
      */
@@ -309,9 +285,7 @@ class Game extends \Table {
     public function stNextPlayer(): void {
         $this->calculateTurnStats();
 
-        $winner = $this->getWinner();
-        if ($winner >= 0) {
-            $this->DbQuery("UPDATE player set player_score = player_score+1 where player_id='$winner'");
+        if ($this->getWinner() >= 0) {
             $this->gamestate->nextState('endGame');
             return;
         }
@@ -727,6 +701,21 @@ class Game extends \Table {
 
         $this->DbQuery("UPDATE pawns set board_section = '{$move->destination->section->name}', board_section_color = '{$move->destination->color->name}', board_section_index = nullif('{$move->destination->index}','') where player = '{$move->pawn->playerId}' and id = '{$move->pawn->id}'");
         $this->triggerClientAnimationForMove($move);
+
+
+        if ($move->destination->section === BoardSection::home) {
+            $playerId = intval($this->getActivePlayerId());
+            $score = self::getFirstRowFromDb("SELECT count(id) as count from pawns where player = '{$playerId}' and board_section = 'home'")->count;
+            $this->DbQuery("UPDATE player set player_score = $score where player_id='$playerId'");
+            $this->notifyAllPlayers(
+                'score',
+                '',
+                [
+                    'playerId' => $playerId,
+                    'score' => $score,
+                ]
+            );
+        }
 
         $this->slidePawnIfOnArrow($move);
     }
