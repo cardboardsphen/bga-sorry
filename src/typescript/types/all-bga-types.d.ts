@@ -9774,6 +9774,7 @@ declare module 'dojo/_base/fx' {
     interface AnimationCallback {
         (node: HTMLElement): void;
     }
+
     interface FadeArguments {
         node: HTMLElement | string;
         duration?: number;
@@ -9787,8 +9788,13 @@ declare module 'dojo/_base/fx' {
     }
     interface AnimationArguments extends FadeArguments {
         properties?: AnimationArgumentsProperties;
-        onEnd?: AnimationCallback;
+        beforeBegin?: () => void;
+        onBegin?: AnimationCallback;
+        onPlay?: AnimationCallback;
         onAnimate?: AnimationCallback;
+        onPause?: AnimationCallback;
+        onEnd?: () => void;
+        onStop?: AnimationCallback;
     }
     global {
         namespace DojoJS {

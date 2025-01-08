@@ -39,10 +39,6 @@ export default class Sorry extends GameGui {
     override setup(gamedatas: BGA.Gamedatas | any): void {
         console.log('Starting game setup');
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') setTimeout(() => this.bgaPerformAction('actRedraw', {}, {checkAction: false}), 100); // wait a tick for any animations to wrap up
-        });
-
         this.addBoardPieces(gamedatas);
         this.placeBoardPieces(gamedatas.pawns, gamedatas.cards);
 
@@ -247,52 +243,39 @@ export default class Sorry extends GameGui {
         await this.wait(3000);
     }
 
-    async notification_movePawns(args: any): Promise<void> {
+    async notification_movePawns(args: PawnMoveArgs): Promise<void> {
         console.log('Received notification: movePawns');
         this.clearPossibleMoves();
 
-        if (!this.bgaAnimationsActive()) {
-            const pawn = dom.byId(`pawn-${args.move.playerId}-${args.move.pawnId}`)!;
-            const [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
-                args.move.section,
-                args.move.color,
-                args.move.index,
-                args.move.id
-            );
-            pawn.style.left = `${pawnDestinationLeft}px`;
-            pawn.style.top = `${pawnDestinationTop}px`;
-            pawn.style.removeProperty('transform');
-            pawn.style.removeProperty('z-index');
+        const move = this.getMoveFromMoveArgs(args.move);
+        const otherMoves = args.otherMoves.map((otherMoveArgs) => this.getMoveFromMoveArgs(otherMoveArgs));
 
-            for (let otherMove of args.otherMoves) {
-                const otherPawn = dom.byId(`pawn-${otherMove.playerId}-${otherMove.pawnId}`)!;
-                const [otherPawnDestinationLeft, otherPawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
-                    otherMove.section,
-                    otherMove.color,
-                    otherMove.index,
-                    otherMove.id
-                );
-                otherPawn.style.left = `${otherPawnDestinationLeft}px`;
-                otherPawn.style.top = `${otherPawnDestinationTop}px`;
-                otherPawn.style.removeProperty('transform');
-                otherPawn.style.removeProperty('z-index');
-            }
+        if (!this.bgaAnimationsActive()) {
+            this.movePawnDirectly(move);
+            for (let otherMove of otherMoves) this.movePawnDirectly(otherMove);
             return;
         }
 
-        const move = this.getMoveFromMoveArgs(args.move);
-        const otherMoves = args.otherMoves.map((otherMoveArgs: any) => this.getMoveFromMoveArgs(otherMoveArgs));
+        const animations: DojoJS.Animation[] = [];
+        animations.push(this.getPawnMoveAnimation(move));
+        for (let otherMove of otherMoves) animations.push(this.getPawnMoveAnimation(otherMove, move.durationMilliseconds));
 
-        const otherDurations = otherMoves.map(
-            (otherMove: any) => otherMove.durationMilliseconds + (otherMove.startMoveAtPercentage * move.durationMilliseconds) / 100
-        );
-        const overallDuration = Math.max(move.durationMilliseconds, ...otherDurations);
-
-        requestAnimationFrame((timestamp) => this.movePawnStep(document.timeline.currentTime as number, move, otherMoves, timestamp));
-        await this.wait(overallDuration);
+        await new Promise<void>((resolve) => {
+            const pawnMoveAnimation = dojo.fx.combine(animations);
+            dojo.connect(pawnMoveAnimation, 'onEnd', () => resolve());
+            pawnMoveAnimation.play();
+        })
+            .catch((error) => {
+                this.movePawnDirectly(move);
+                for (let otherMove of otherMoves) this.movePawnDirectly(otherMove);
+            })
+            .finally(() => {
+                dojo.query('.jumpping').removeClass('jumpping');
+            });
     }
 
     async notification_redraw(args: any): Promise<void> {
+        throw new Error('badd');
         console.log('Received notification: redraw');
         this.placeBoardPieces(args.pawns, args.cards);
     }
@@ -472,8 +455,6 @@ export default class Sorry extends GameGui {
 
             pawnElement.style.left = `${pawnDestinationLeft}px`;
             pawnElement.style.top = `${pawnDestinationTop}px`;
-            pawnElement.style.removeProperty('transform');
-            pawnElement.style.removeProperty('z-index');
         }
 
         if (cards.nextCard) {
@@ -595,60 +576,7 @@ export default class Sorry extends GameGui {
         });
     }
 
-    movePawnStep(
-        zero: number,
-        move: {
-            pawn: HTMLElement;
-            moveType: string;
-            durationMilliseconds: number;
-            startMoveAtPercentage: number;
-            startingLeft: number;
-            startingTop: number;
-            offsetLeft: number;
-            offsetTop: number;
-        },
-        otherMoves: Array<{
-            pawn: HTMLElement;
-            moveType: string;
-            durationMilliseconds: number;
-            startMoveAtPercentage: number;
-            startingLeft: number;
-            startingTop: number;
-            offsetLeft: number;
-            offsetTop: number;
-        }>,
-        timestamp: number
-    ) {
-        const elapsedMilliseconds = timestamp - zero;
-        if (elapsedMilliseconds >= move.durationMilliseconds) {
-            move.pawn.style.left = `${move.startingLeft + move.offsetLeft}px`;
-            move.pawn.style.top = `${move.startingTop + move.offsetTop}px`;
-            move.pawn.style.removeProperty('z-index');
-            return;
-        }
-
-        const elapsedFraction = elapsedMilliseconds / move.durationMilliseconds;
-        for (let otherMove of [...otherMoves]) {
-            if (elapsedFraction >= otherMove.startMoveAtPercentage / 100) {
-                otherMoves.splice(otherMoves.indexOf(otherMove), 1);
-                requestAnimationFrame((timestamp) => this.movePawnStep(document.timeline.currentTime as number, otherMove, [], timestamp));
-            }
-        }
-        const easeInOutScaling = 0.56815808768082454 * Math.sin((0.7 * elapsedFraction - 0.3) * Math.PI) + 0.45964954842535866;
-        move.pawn.style.left = `${move.startingLeft + easeInOutScaling * move.offsetLeft}px`;
-        move.pawn.style.top = `${move.startingTop + easeInOutScaling * move.offsetTop}px`;
-        move.pawn.style.zIndex = '4';
-
-        if (move.moveType === 'jump') {
-            if (elapsedFraction < 0.5)
-                move.pawn.style.transform = `scale(${1 + 0.5 * easeInOutScaling}) translate3d(0, 0, ${100 * easeInOutScaling}px)`;
-            else move.pawn.style.transform = `scale(${1 + 0.5 * (1 - easeInOutScaling)}) translate3d(0, 0, ${100 * (1 - easeInOutScaling)}px)`;
-        }
-
-        requestAnimationFrame((timestamp) => this.movePawnStep(zero, move, otherMoves, timestamp));
-    }
-
-    getMoveFromMoveArgs(move: any): any {
+    getMoveFromMoveArgs(move: SinglePawnMoveArgs): PawnMove {
         const pawn = dom.byId(`pawn-${move.playerId}-${move.pawnId}`)!;
         const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
         const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
@@ -667,6 +595,41 @@ export default class Sorry extends GameGui {
             offsetLeft: offsetLeft,
             offsetTop: offsetTop,
         };
+    }
+
+    movePawnDirectly(move: PawnMove): void {
+        dojo.style(move.pawn, {
+            left: `${move.startingLeft + move.offsetLeft}px`,
+            top: `${move.startingTop + move.offsetTop}px`,
+            transform: '',
+            zIndex: '',
+        });
+    }
+
+    getPawnMoveAnimation(move: PawnMove, moveDelayReference: number = 0): DojoJS.Animation {
+        return dojo.animateProperty({
+            node: move.pawn,
+            properties: {
+                left: {start: move.startingLeft, end: move.startingLeft + move.offsetLeft},
+                top: {start: move.startingTop, end: move.startingTop + move.offsetTop},
+            },
+            delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
+            duration: move.durationMilliseconds,
+            easing: (x) => 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866,
+            beforeBegin: () => {
+                dojo.style(move.pawn, {zIndex: '2'});
+                if (move.moveType === 'jump') {
+                    dojo.style(move.pawn, {
+                        animationDuration: `${move.durationMilliseconds}ms`,
+                    });
+                    dojo.addClass(move.pawn, 'jumpping');
+                }
+            },
+            onEnd: () => {
+                dojo.removeClass(move.pawn, 'jumpping');
+                dojo.style(move.pawn, {zIndex: ''});
+            },
+        });
     }
 
     shuffleArray(array: any[]): void {
