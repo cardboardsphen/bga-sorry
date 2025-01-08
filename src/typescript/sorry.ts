@@ -18,10 +18,11 @@
 /// <amd-module name="bgagame/sorry"/>
 /// <reference path="./types/all-bga-types.d.ts"/>
 
-import 'dojo';
-import 'dojo/_base/declare';
 import 'ebg/counter';
 import * as GameGui from 'ebg/core/gamegui';
+
+import * as dojo from 'dojo';
+import * as dom from 'dojo/dom';
 
 /**
  * Client implementation of Sorry.
@@ -87,7 +88,7 @@ export default class Sorry extends GameGui {
     //// State Handling
     enteringState_drawCard(args: any): void {
         this.clearPossibleMoves();
-        if (this.isCurrentPlayerActive()) document.getElementById('draw-pile')!.classList.add('possible-move');
+        if (this.isCurrentPlayerActive()) dom.byId('draw-pile')!.classList.add('possible-move');
     }
 
     leavingState_drawCard(): void {
@@ -103,18 +104,18 @@ export default class Sorry extends GameGui {
 
         if (this.isCurrentPlayerActive()) {
             for (let pawnId in args.args.possibleMoves) {
-                document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('possible-move');
+                dom.byId(`pawn-${args.args.player}-${pawnId}`)!.classList.add('possible-move');
 
                 for (let location of args.args.possibleMoves[pawnId]) {
                     let locationId = this.getLocationId(location.section, location.color, location.index);
-                    let locationElement = document.getElementById(locationId)!;
+                    let locationElement = dom.byId(locationId)!;
                     locationElement.classList.add('possible-move-destination');
                     locationElement.classList.add(`for-pawn-${pawnId}`);
                 }
             }
 
             if (args.args.selectedMove) {
-                document.getElementById(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
+                dom.byId(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
                 document
                     .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
                     .classList.add('selected-move');
@@ -146,16 +147,16 @@ export default class Sorry extends GameGui {
 
         if (this.isCurrentPlayerActive()) {
             for (let pawnId in args.args.possibleMoves) {
-                document.getElementById(`pawn-${args.args.player}-${pawnId}`)!.classList.add('active-pawn', `for-pawn-${pawnId}`);
+                dom.byId(`pawn-${args.args.player}-${pawnId}`)!.classList.add('active-pawn', `for-pawn-${pawnId}`);
 
                 for (let location of args.args.possibleMoves[pawnId]) {
                     let locationId = this.getLocationId(location.section, location.color, location.index);
-                    document.getElementById(locationId)!.classList.add('possible-move', `for-pawn-${pawnId}`);
+                    dom.byId(locationId)!.classList.add('possible-move', `for-pawn-${pawnId}`);
                 }
             }
 
             if (args.args.selectedMove) {
-                document.getElementById(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
+                dom.byId(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
                 document
                     .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
                     .classList.add('selected-move');
@@ -184,13 +185,13 @@ export default class Sorry extends GameGui {
         console.log('Received notification: drawCard');
         this.clearPossibleMoves();
 
-        let card = document.getElementById('reveal-card')!;
+        let card = dom.byId('reveal-card')!;
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
         card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
-        if (args.hasMoreToDraw) document.getElementById('draw-card')!.classList.remove('hidden');
-        else document.getElementById('draw-card')!.classList.add('hidden');
+        if (args.hasMoreToDraw) dom.byId('draw-card')!.classList.remove('hidden');
+        else dom.byId('draw-card')!.classList.add('hidden');
 
         if (this.bgaAnimationsActive()) {
             card.classList.add('revealing');
@@ -202,7 +203,7 @@ export default class Sorry extends GameGui {
 
     async notification_discardCard(args: any): Promise<void> {
         console.log('Received notification: discardCard');
-        let card = document.getElementById('reveal-card')!;
+        let card = dom.byId('reveal-card')!;
         let cardFront = card.querySelector('.front') as HTMLElement;
         cardFront.dataset['rank'] = args.rank;
 
@@ -211,23 +212,23 @@ export default class Sorry extends GameGui {
             card.classList.add('discarding');
             await this.wait(2000);
         } else {
-            document.getElementById('discard-card')!.dataset['rank'] = args.rank;
-            document.getElementById('discard-card')!.classList.remove('hidden');
+            dom.byId('discard-card')!.dataset['rank'] = args.rank;
+            dom.byId('discard-card')!.classList.remove('hidden');
             card.classList.add('hidden');
         }
     }
 
     async notification_shuffleDeck(args: any): Promise<void> {
         console.log('Received notification: shuffleDeck');
-        document.getElementById('reveal-card')!.classList.add('hidden');
+        dom.byId('reveal-card')!.classList.add('hidden');
 
         if (!this.bgaAnimationsActive()) {
-            document.getElementById('draw-card')!.classList.remove('hidden');
-            document.getElementById('discard-card')!.classList.add('hidden');
+            dom.byId('draw-card')!.classList.remove('hidden');
+            dom.byId('discard-card')!.classList.add('hidden');
             return;
         }
 
-        const shuffleCards = document.getElementById('shuffle-cards')!;
+        const shuffleCards = dom.byId('shuffle-cards')!;
         let ranks = ['1', '2', '3', '4', '5', '7', '8', '10', '11', '12', 'sorry'];
         ranks = ranks.filter((r) => r != args.rank);
         this.shuffleArray(ranks);
@@ -242,7 +243,7 @@ export default class Sorry extends GameGui {
         shuffleCards.classList.add('shuffling');
         shuffleCards.classList.remove('hidden');
 
-        document.getElementById('discard-card')!.classList.add('hidden');
+        dom.byId('discard-card')!.classList.add('hidden');
         await this.wait(3000);
     }
 
@@ -251,7 +252,7 @@ export default class Sorry extends GameGui {
         this.clearPossibleMoves();
 
         if (!this.bgaAnimationsActive()) {
-            const pawn = document.getElementById(`pawn-${args.move.playerId}-${args.move.pawnId}`)!;
+            const pawn = dom.byId(`pawn-${args.move.playerId}-${args.move.pawnId}`)!;
             const [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
                 args.move.section,
                 args.move.color,
@@ -264,7 +265,7 @@ export default class Sorry extends GameGui {
             pawn.style.removeProperty('z-index');
 
             for (let otherMove of args.otherMoves) {
-                const otherPawn = document.getElementById(`pawn-${otherMove.playerId}-${otherMove.pawnId}`)!;
+                const otherPawn = dom.byId(`pawn-${otherMove.playerId}-${otherMove.pawnId}`)!;
                 const [otherPawnDestinationLeft, otherPawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
                     otherMove.section,
                     otherMove.color,
@@ -306,7 +307,7 @@ export default class Sorry extends GameGui {
      * @param gamedatas Data from the server.
      */
     addBoardPieces(gamedatas: BGA.Gamedatas | any): void {
-        document.getElementById('game_play_area')!.insertAdjacentHTML(
+        dom.byId('game_play_area')!.insertAdjacentHTML(
             'beforeend',
             `
                 <div id="board">
@@ -315,7 +316,7 @@ export default class Sorry extends GameGui {
             `
         );
 
-        const board = document.getElementById('board')!;
+        const board = dom.byId('board')!;
 
         // start spaces
         board.insertAdjacentHTML(
@@ -391,7 +392,7 @@ export default class Sorry extends GameGui {
                 <div class="card hidden" data-rank="back" id="draw-card"></div>
             </div>`
         );
-        document.getElementById('draw-pile')!.addEventListener('click', (e) => {
+        dom.byId('draw-pile')!.addEventListener('click', (e) => {
             if ((e.currentTarget as HTMLElement).classList.contains('possible-move') && this.checkAction('actDrawCard', true))
                 this.bgaPerformAction('actDrawCard');
         });
@@ -404,12 +405,12 @@ export default class Sorry extends GameGui {
                 <div class="card front"></div>
             </div>`
         );
-        document.getElementById('reveal-card')!.addEventListener('animationend', this.revealCardAnimationStopped.bind(this));
-        document.getElementById('reveal-card')!.addEventListener('animationcancel', this.revealCardAnimationStopped.bind(this));
+        dom.byId('reveal-card')!.addEventListener('animationend', this.revealCardAnimationStopped.bind(this));
+        dom.byId('reveal-card')!.addEventListener('animationcancel', this.revealCardAnimationStopped.bind(this));
 
         board.insertAdjacentHTML('beforeend', `<div id="shuffle-cards" class="card-pile hidden"></div>`);
         for (let rank of [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 'sorry']) {
-            document.getElementById('shuffle-cards')!.insertAdjacentHTML(
+            dom.byId('shuffle-cards')!.insertAdjacentHTML(
                 'beforeend',
                 `<div class="shuffle-card">
                     <div class="card back" data-rank="back"></div>
@@ -433,8 +434,8 @@ export default class Sorry extends GameGui {
                 i++;
             });
         }
-        document.getElementById('shuffle-cards')!.addEventListener('animationend', this.shuffleCardsAnimationStopped.bind(this));
-        document.getElementById('shuffle-cards')!.addEventListener('animationcancel', this.shuffleCardsAnimationStopped.bind(this));
+        dom.byId('shuffle-cards')!.addEventListener('animationend', this.shuffleCardsAnimationStopped.bind(this));
+        dom.byId('shuffle-cards')!.addEventListener('animationcancel', this.shuffleCardsAnimationStopped.bind(this));
 
         // create pawns
         for (let pawn of gamedatas.pawns) {
@@ -461,7 +462,7 @@ export default class Sorry extends GameGui {
     placeBoardPieces(pawns: any, cards: any): void {
         for (let pawn of pawns) {
             let pawnElementId = `pawn-${pawn.player}-${pawn.id}`;
-            let pawnElement = document.getElementById(pawnElementId)!;
+            let pawnElement = dom.byId(pawnElementId)!;
             let [pawnDestinationLeft, pawnDestinationTop] = this.getPawnCoorinatesInPixelsAtLocation(
                 pawn.boardSection,
                 pawn.boardSectionColor,
@@ -476,25 +477,25 @@ export default class Sorry extends GameGui {
         }
 
         if (cards.nextCard) {
-            document.getElementById('draw-card')!.classList.remove('hidden');
+            dom.byId('draw-card')!.classList.remove('hidden');
         } else {
-            document.getElementById('draw-card')!.classList.add('hidden');
+            dom.byId('draw-card')!.classList.add('hidden');
         }
 
         if (cards.revealCard) {
-            document.getElementById('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
-            document.getElementById('reveal-card')!.classList.add('revealed');
+            dom.byId('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
+            dom.byId('reveal-card')!.classList.add('revealed');
             (document.querySelector('#reveal-card .front') as HTMLElement).dataset['rank'] = cards.revealCard;
         } else {
-            document.getElementById('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
-            document.getElementById('reveal-card')!.classList.add('hidden');
+            dom.byId('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
+            dom.byId('reveal-card')!.classList.add('hidden');
         }
 
         if (cards.lastCard) {
-            document.getElementById('discard-card')!.classList.remove('hidden');
-            document.getElementById('discard-card')!.dataset['rank'] = cards.lastCard;
+            dom.byId('discard-card')!.classList.remove('hidden');
+            dom.byId('discard-card')!.dataset['rank'] = cards.lastCard;
         } else {
-            document.getElementById('discard-card')!.classList.add('hidden');
+            dom.byId('discard-card')!.classList.add('hidden');
         }
     }
 
@@ -507,14 +508,14 @@ export default class Sorry extends GameGui {
     revealCardAnimationStopped(e: AnimationEvent): void {
         let card = e.currentTarget as HTMLElement;
         if (card.classList.contains('revealing')) {
-            document.getElementById('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
+            dom.byId('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
             card.classList.add('revealed');
         }
         if (card.classList.contains('discarding')) {
             let rank = (card.querySelector('.front') as HTMLElement).dataset['rank'];
-            document.getElementById('discard-card')!.dataset['rank'] = rank;
-            document.getElementById('discard-card')!.classList.remove('hidden');
-            document.getElementById('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
+            dom.byId('discard-card')!.dataset['rank'] = rank;
+            dom.byId('discard-card')!.classList.remove('hidden');
+            dom.byId('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
             card.classList.add('hidden');
         }
     }
@@ -524,7 +525,7 @@ export default class Sorry extends GameGui {
         if (shuffleCards.classList.contains('shuffling')) {
             shuffleCards.classList.remove('shuffling');
             shuffleCards.classList.add('hidden');
-            document.getElementById('draw-card')!.classList.remove('hidden');
+            dom.byId('draw-card')!.classList.remove('hidden');
         }
     }
 
@@ -536,7 +537,7 @@ export default class Sorry extends GameGui {
      */
     getPawnCoorinatesInPixelsAtLocation(section: string, sectionColor: string, sectionIndex: string, pawnId: number): [number, number] {
         let locationId = this.getLocationId(section, sectionColor, sectionIndex === null ? null : parseInt(sectionIndex));
-        let boardLocationStyle = window.getComputedStyle(document.getElementById(locationId)!);
+        let boardLocationStyle = window.getComputedStyle(dom.byId(locationId)!);
         let locationLeft = this.parseDimensionToPx(boardLocationStyle.left);
         let locationTop = this.parseDimensionToPx(boardLocationStyle.top);
         let leftOffset = 4;
@@ -648,7 +649,7 @@ export default class Sorry extends GameGui {
     }
 
     getMoveFromMoveArgs(move: any): any {
-        const pawn = document.getElementById(`pawn-${move.playerId}-${move.pawnId}`)!;
+        const pawn = dom.byId(`pawn-${move.playerId}-${move.pawnId}`)!;
         const startingLeft = this.parseDimensionToPx(window.getComputedStyle(pawn).left);
         const startingTop = this.parseDimensionToPx(window.getComputedStyle(pawn).top);
 
@@ -676,4 +677,4 @@ export default class Sorry extends GameGui {
     }
 }
 
-define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], dojo.declare('bgagame.sorry', ebg.core.gamegui, new Sorry()));
+dojo.declare('bgagame.sorry', GameGui, new Sorry());
