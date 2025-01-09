@@ -236,6 +236,10 @@
     left: 375px;
     top: 475px;
 }
+#reveal-pile {
+    left: 475px;
+    top: 400px;
+}
 
 .card {
     width: 96px;
@@ -293,106 +297,15 @@
     }
 }
 
-@keyframes reveal-card {
-    0% {
-        transform: rotate(-90deg);
-    }
-    30% {
-        transform: scale(1.4) translate3d(-10px, 10px, 50px) rotate(-90deg);
-    }
-    65% {
-        transform: scale(1.6) translate3d(15px, -35px, 75px) rotate(-45deg);
-    }
-    100% {
-        transform: scale(1.8) translate3d(45px, -58px, 100px);
-    }
-}
-@keyframes reveal-card-front {
-    0% {
-        transform: rotateY(180deg);
-    }
-    30% {
-        transform: rotateY(180deg);
-    }
-    65% {
-        transform: rotateY(90deg);
-    }
-    100% {
-        transform: none;
-    }
-}
-@keyframes reveal-card-back {
-    0% {
-        transform: none;
-    }
-    30% {
-        transform: none;
-    }
-    65% {
-        transform: rotateY(-90deg);
-    }
-    100% {
-        transform: rotateY(-180deg);
-    }
-}
-
-@keyframes discard-card {
-    0% {
-        transform: scale(1.8) translate3d(45px, -58px, 100px);
-    }
-    100% {
-        transform: translate3d(0, 150px, 0) rotate(-90deg);
-    }
-}
-
 #reveal-card {
-    // default is at the draw pile
-    left: 377px;
-    top: 423px;
     width: 96px;
     height: 146px;
     position: absolute;
-    transform: rotate(-90deg);
-    transform-origin: top left;
+    transform-origin: center;
     z-index: 3;
 
     .card {
         backface-visibility: hidden;
-
-        &.front {
-            transform: rotateY(180deg);
-        }
-    }
-
-    &.revealing {
-        animation: reveal-card 3s linear forwards;
-
-        .front {
-            animation: reveal-card-front 3s linear forwards;
-        }
-        .back {
-            animation: reveal-card-back 3s linear forwards;
-        }
-    }
-    &.revealed {
-        transform: scale(1.8) translate3d(45px, -58px, 100px);
-
-        .front {
-            transform: none;
-        }
-        .back {
-            transform: rotateY(-180deg);
-        }
-    }
-    &.discarding {
-        animation: discard-card 2s linear forwards;
-
-        .front {
-            transform: none;
-        }
-        .back {
-            transform: rotateY(-180deg);
-        }
     }
 }
 

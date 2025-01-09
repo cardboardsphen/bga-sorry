@@ -7760,14 +7760,18 @@ declare module 'dojo/dom-style' {
                 /**
                  * Accesses styles on a node.
                  */
-                get(node: Element | string): CSSStyleDeclaration;
-                get<T extends keyof CSSStyleDeclaration>(node: Element | string, name: T): CSSStyleDeclaration[T];
+                get(node: Element | string | Node): CSSStyleDeclaration;
+                get<T extends keyof CSSStyleDeclaration>(node: Element | string | Node, name: T): CSSStyleDeclaration[T];
                 /**
                  * Sets styles on a node.
                  */
-                set(node: Element | string, props: Partial<CSSStyleDeclaration>): CSSStyleDeclaration;
-                set(node: Element | string, name: 'opacity', value: number): number;
-                set<T extends keyof CSSStyleDeclaration>(node: Element | string, name: T, value: CSSStyleDeclaration[T]): CSSStyleDeclaration[T];
+                set(node: Element | string | Node, props: Partial<CSSStyleDeclaration>): CSSStyleDeclaration;
+                set(node: Element | string | Node, name: 'opacity', value: number): number;
+                set<T extends keyof CSSStyleDeclaration>(
+                    node: Element | string | Node,
+                    name: T,
+                    value: CSSStyleDeclaration[T]
+                ): CSSStyleDeclaration[T];
                 /**
                  * converts style value to pixels on IE or return a numeric value.
                  */
@@ -8654,18 +8658,18 @@ declare module 'dojo/dom-attr' {
          * Returns true if the requested attribute is specified on the given element, and false otherwise.
          * @throws {TypeError} if node is not resolved to an element
          */
-        has(node: Element | string, name: string): boolean | throws<TypeError>;
+        has(node: Element | string | Node, name: string): boolean | throws<TypeError>;
         /**
          * Gets the value of the named property from the provided element.
          * @throws {TypeError} if node is not resolved to an element
          */
         get<T extends Element, U extends string>(node: T, name: U): U extends keyof T ? T[U] : unknown;
-        get(node: string | Element, name: 'textContent' | 'textcontent'): (string | '') | throws<TypeError>;
+        get(node: string | Element | Node, name: 'textContent' | 'textcontent'): (string | '') | throws<TypeError>;
         /**
          * Sets the value of a property on an HTML element.
          * @throws {TypeError} if node is not resolved to an element
          */
-        set<T extends Element, U extends keyof T>(node: T, name: U, value: T[U]): T;
+        set<T extends Element, U extends keyof T>(node: string | T | Node, name: string | U, value: T[U]): T;
         set<
             T extends Element,
             U extends {
@@ -9776,7 +9780,7 @@ declare module 'dojo/_base/fx' {
     }
 
     interface FadeArguments {
-        node: HTMLElement | string;
+        node: HTMLElement | string | Node;
         duration?: number;
         easing?: EasingFunction;
         start?: Function;
@@ -9828,7 +9832,7 @@ declare module 'dojo/_base/fx' {
                  * immediately, unlike nearly every other Dojo animation API.
                  */
                 anim(
-                    node: HTMLElement | string,
+                    node: HTMLElement | string | Node,
                     properties: {
                         [name: string]: any;
                     },

@@ -21,8 +21,13 @@
 import 'ebg/counter';
 import * as GameGui from 'ebg/core/gamegui';
 
-import * as dojo from 'dojo';
 import * as dom from 'dojo/dom';
+import * as domAttr from 'dojo/dom-attr';
+import * as domClass from 'dojo/dom-class';
+import * as domStyle from 'dojo/dom-style';
+import * as fx from 'dojo/fx';
+import * as on from 'dojo/on';
+import * as query from 'dojo/query';
 
 /**
  * Client implementation of Sorry.
@@ -181,37 +186,48 @@ export default class Sorry extends GameGui {
         console.log('Received notification: drawCard');
         this.clearPossibleMoves();
 
-        let card = dom.byId('reveal-card')!;
-        let cardFront = card.querySelector('.front') as HTMLElement;
-        cardFront.dataset['rank'] = args.rank;
+        this.drawCard(args.rank);
 
-        card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
-        if (args.hasMoreToDraw) dom.byId('draw-card')!.classList.remove('hidden');
-        else dom.byId('draw-card')!.classList.add('hidden');
+        if (args.hasMoreToDraw) domClass.remove('draw-card', 'hidden');
+        else domClass.add('draw-card', 'hidden');
 
-        if (this.bgaAnimationsActive()) {
-            card.classList.add('revealing');
-            await this.wait(2000); // return early so card is logged about when it is revealed
-        } else {
-            card.classList.add('revealed');
-        }
+        await this.wait(2000); // return early so card is logged about when it is visible
     }
 
     async notification_discardCard(args: any): Promise<void> {
         console.log('Received notification: discardCard');
         let card = dom.byId('reveal-card')!;
-        let cardFront = card.querySelector('.front') as HTMLElement;
-        cardFront.dataset['rank'] = args.rank;
+        query('.front', card).attr('data-rank', args.rank);
 
-        if (this.bgaAnimationsActive() && (card.classList.contains('revealing') || card.classList.contains('revealed'))) {
-            card.classList.remove('hidden', 'revealing', 'revealed', 'discarding');
-            card.classList.add('discarding');
-            await this.wait(2000);
-        } else {
-            dom.byId('discard-card')!.dataset['rank'] = args.rank;
-            dom.byId('discard-card')!.classList.remove('hidden');
-            card.classList.add('hidden');
+        if (!this.bgaAnimationsActive()) {
+            domAttr.set('discard-card', 'data-rank', args.rank);
+            domClass.remove('discard-card', 'hidden');
+            domClass.add(card, 'hidden');
+            return;
         }
+
+        const animations: DojoJS.Animation[] = [];
+        animations.push(this.slideToObject(card, 'discard-pile', 2000));
+        animations.push(
+            dojo.animateProperty({
+                node: card,
+                properties: {
+                    angle: {start: 0, end: -90},
+                    scale: {start: 1.8, end: 1},
+                },
+                duration: this.bgaAnimationsActive() && !domClass.contains(card, 'hidden') ? 2000 : 0,
+                easing: fx.easing.linear,
+                onAnimate: (p: any) => domStyle.set(card, 'transform', `scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`),
+                onEnd: () => {
+                    domAttr.set('discard-card', 'data-rank', args.rank);
+                    domClass.remove('discard-card', 'hidden');
+                    domClass.add(card, 'hidden');
+                },
+            })
+        );
+
+        domClass.remove(card, 'hidden');
+        await this.playAllAnimations(animations);
     }
 
     async notification_shuffleDeck(args: any): Promise<void> {
@@ -260,17 +276,13 @@ export default class Sorry extends GameGui {
         animations.push(this.getPawnMoveAnimation(move));
         for (let otherMove of otherMoves) animations.push(this.getPawnMoveAnimation(otherMove, move.durationMilliseconds));
 
-        await new Promise<void>((resolve) => {
-            const pawnMoveAnimation = dojo.fx.combine(animations);
-            dojo.connect(pawnMoveAnimation, 'onEnd', () => resolve());
-            pawnMoveAnimation.play();
-        })
+        await this.playAllAnimations(animations)
             .catch((error) => {
                 this.movePawnDirectly(move);
                 for (let otherMove of otherMoves) this.movePawnDirectly(otherMove);
             })
             .finally(() => {
-                dojo.query('.jumpping').removeClass('jumpping');
+                query('.jumpping').removeClass('jumpping');
             });
     }
 
@@ -379,6 +391,9 @@ export default class Sorry extends GameGui {
                 this.bgaPerformAction('actDrawCard');
         });
 
+        // reveal pile
+        board.insertAdjacentHTML('beforeend', `<div id="reveal-pile" class="card-pile"></div>`);
+
         // reveal card
         board.insertAdjacentHTML(
             'beforeend',
@@ -387,8 +402,6 @@ export default class Sorry extends GameGui {
                 <div class="card front"></div>
             </div>`
         );
-        dom.byId('reveal-card')!.addEventListener('animationend', this.revealCardAnimationStopped.bind(this));
-        dom.byId('reveal-card')!.addEventListener('animationcancel', this.revealCardAnimationStopped.bind(this));
 
         board.insertAdjacentHTML('beforeend', `<div id="shuffle-cards" class="card-pile hidden"></div>`);
         for (let rank of [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 'sorry']) {
@@ -463,11 +476,9 @@ export default class Sorry extends GameGui {
         }
 
         if (cards.revealCard) {
-            dom.byId('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
-            dom.byId('reveal-card')!.classList.add('revealed');
-            (document.querySelector('#reveal-card .front') as HTMLElement).dataset['rank'] = cards.revealCard;
+            domClass.remove('reveal-card', 'hidden');
+            this.drawCard(cards.revealCard);
         } else {
-            dom.byId('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
             dom.byId('reveal-card')!.classList.add('hidden');
         }
 
@@ -485,19 +496,74 @@ export default class Sorry extends GameGui {
         return destinationId;
     }
 
-    revealCardAnimationStopped(e: AnimationEvent): void {
-        let card = e.currentTarget as HTMLElement;
-        if (card.classList.contains('revealing')) {
-            dom.byId('reveal-card')!.classList.remove('hidden', 'revealing', 'discarding');
-            card.classList.add('revealed');
+    drawCard(rank: string) {
+        let card = dom.byId('reveal-card')!;
+        let frontFace = query('.front', card)[0]!;
+        let backFace = query('.back', card)[0]!;
+
+        domAttr.set(frontFace, 'data-rank', rank);
+        domClass.remove(card, 'hidden');
+
+        if (!this.bgaAnimationsActive()) {
+            this.placeOnObject(card, 'reveal-pile');
+            domStyle.set(card, 'transform', 'scale(1.8)');
+            domStyle.set(frontFace, 'transform', 'none');
+            domStyle.set(backFace, 'transform', 'rotateY(-180deg)');
+            return;
         }
-        if (card.classList.contains('discarding')) {
-            let rank = (card.querySelector('.front') as HTMLElement).dataset['rank'];
-            dom.byId('discard-card')!.dataset['rank'] = rank;
-            dom.byId('discard-card')!.classList.remove('hidden');
-            dom.byId('reveal-card')!.classList.remove('revealing', 'revealed', 'discarding');
-            card.classList.add('hidden');
-        }
+
+        this.placeOnObject(card, 'draw-pile');
+        domStyle.set(frontFace, 'transform', 'rotateY(180deg)');
+        domStyle.set(backFace, 'transform', 'none');
+
+        const animations: DojoJS.Animation[] = [];
+        animations.push(this.slideToObject(card, 'reveal-pile', 3000));
+        const liftCard = fx.chain([
+            dojo.animateProperty({
+                node: card,
+                properties: {transformScale: {start: 1, end: 1.4}, transformRotate: {start: -90, end: -90}},
+                duration: 1000,
+                easing: fx.easing.linear,
+            }),
+            dojo.animateProperty({
+                node: card,
+                properties: {transformScale: {start: 1.4, end: 1.6}, transformRotate: {start: -90, end: -45}},
+                duration: 1000,
+                easing: fx.easing.linear,
+            }),
+            dojo.animateProperty({
+                node: card,
+                properties: {transformScale: {start: 1.6, end: 1.8}, transformRotate: {start: -45, end: 0}},
+                duration: 1000,
+                easing: fx.easing.linear,
+            }),
+        ]);
+        dojo.connect(liftCard, 'onAnimate', (p: any) =>
+            domStyle.set(card, 'transform', `scale(${p.transformScale.slice(0, -2)}) rotate(${p.transformRotate.slice(0, -2)}deg)`)
+        );
+        animations.push(liftCard);
+        animations.push(
+            dojo.animateProperty({
+                node: frontFace,
+                properties: {rotateY: {start: 180, end: 0}},
+                duration: 2000,
+                delay: 1000,
+                easing: fx.easing.linear,
+                onAnimate: (p: any) => domStyle.set(frontFace, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+            })
+        );
+        animations.push(
+            dojo.animateProperty({
+                node: backFace,
+                properties: {rotateY: {start: 0, end: -180}},
+                duration: 2000,
+                delay: 1000,
+                easing: fx.easing.linear,
+                onAnimate: (p: any) => domStyle.set(backFace, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+            })
+        );
+
+        this.playAllAnimations(animations);
     }
 
     shuffleCardsAnimationStopped(e: AnimationEvent): void {
@@ -564,15 +630,11 @@ export default class Sorry extends GameGui {
     }
 
     clearPossibleMoves(): void {
-        document.querySelectorAll('.possible-move').forEach((div) => div.classList.remove('possible-move'));
-        document.querySelectorAll('.possible-move-destination').forEach((div) => div.classList.remove('possible-move-destination'));
-        document.querySelectorAll('.active-pawn').forEach((div) => div.classList.remove('active-pawn'));
-        document.querySelectorAll('.selected-move').forEach((div) => div.classList.remove('selected-move'));
-        document.querySelectorAll('[class*="for-pawn-"]').forEach((div) => {
-            let a = div.classList.forEach((className) => {
-                if (className.startsWith('for-pawn')) div.classList.remove(className);
-            });
-        });
+        query('.possible-move').removeClass('possible-move');
+        query('.possible-move-destination').removeClass('possible-move-destination');
+        query('.active-pawn').removeClass('active-pawn');
+        query('.selected-move').removeClass('selected-move');
+        query('[class*="for-pawn-"]').removeClass('for-pawn-0 for-pawn-1 for-pawn-2 for-pawn-3');
     }
 
     getMoveFromMoveArgs(move: SinglePawnMoveArgs): PawnMove {
@@ -597,7 +659,7 @@ export default class Sorry extends GameGui {
     }
 
     movePawnDirectly(move: PawnMove): void {
-        dojo.style(move.pawn, {
+        domStyle.set(move.pawn, {
             left: `${move.startingLeft + move.offsetLeft}px`,
             top: `${move.startingTop + move.offsetTop}px`,
             transform: '',
@@ -616,18 +678,27 @@ export default class Sorry extends GameGui {
             duration: move.durationMilliseconds,
             easing: (x) => 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866,
             beforeBegin: () => {
-                dojo.style(move.pawn, {zIndex: '2'});
+                domStyle.set(move.pawn, {zIndex: '2'});
                 if (move.moveType === 'jump') {
-                    dojo.style(move.pawn, {
+                    domStyle.set(move.pawn, {
                         animationDuration: `${move.durationMilliseconds}ms`,
                     });
-                    dojo.addClass(move.pawn, 'jumpping');
+                    domClass.add(move.pawn, 'jumpping');
                 }
             },
             onEnd: () => {
-                dojo.removeClass(move.pawn, 'jumpping');
-                dojo.style(move.pawn, {zIndex: ''});
+                domClass.remove(move.pawn, 'jumpping');
+                domStyle.set(move.pawn, {zIndex: ''});
             },
+        });
+    }
+
+    playAllAnimations(animations: DojoJS.Animation[]): Promise<void> {
+        console.log('starting animation');
+        return new Promise<void>((resolve) => {
+            const animation = fx.combine(animations);
+            dojo.connect(animation, 'onEnd', () => resolve());
+            animation.play();
         });
     }
 
@@ -639,4 +710,6 @@ export default class Sorry extends GameGui {
     }
 }
 
-dojo.declare('bgagame.sorry', GameGui, new Sorry());
+require(['dojo/_base/declare'], function (declare) {
+    declare('bgagame.sorry', GameGui, new Sorry());
+});
