@@ -8632,19 +8632,19 @@ declare module 'dojo/dom-prop' {
          * Gets a property on an HTML element.
          * @throws {TypeError} if node is not resolved to an element
          */
-        get<T extends Element, U extends string>(node: T, name: U): U extends keyof T ? T[U] : undefined;
-        get(node: string | Element, name: 'textContent' | 'textcontent'): (string | '') | throws<TypeError>;
+        get<T extends Element, U extends string>(node: T | Node, name: U): U extends keyof T ? T[U] : undefined;
+        get(node: string | Element | Node, name: 'textContent' | 'textcontent'): (string | '') | throws<TypeError>;
         /**
          * Sets a property on an HTML element.
          * @throws {TypeError} if node is not resolved to an element
          */
-        set<T extends Element, U extends keyof T>(node: T, name: U, value: T[U]): T;
+        set<T extends Element, U extends keyof T>(node: T | Node, name: U, value: T[U]): T;
         set<
             T extends Element,
             U extends {
                 [K in keyof T]?: T[K];
             }
-        >(node: T, name: U): T;
+        >(node: T | Node, name: U): T;
     }
     const _default_13: Props;
     export = _default_13;
@@ -8663,7 +8663,7 @@ declare module 'dojo/dom-attr' {
          * Gets the value of the named property from the provided element.
          * @throws {TypeError} if node is not resolved to an element
          */
-        get<T extends Element, U extends string>(node: T, name: U): U extends keyof T ? T[U] : unknown;
+        get<T extends Element, U extends string>(node: T | Node, name: U): U extends keyof T ? T[U] : unknown;
         get(node: string | Element | Node, name: 'textContent' | 'textcontent'): (string | '') | throws<TypeError>;
         /**
          * Sets the value of a property on an HTML element.

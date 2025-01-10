@@ -24,9 +24,10 @@ import * as GameGui from 'ebg/core/gamegui';
 import * as dom from 'dojo/dom';
 import * as domAttr from 'dojo/dom-attr';
 import * as domClass from 'dojo/dom-class';
+import * as domConstruct from 'dojo/dom-construct';
+import * as domProp from 'dojo/dom-prop';
 import * as domStyle from 'dojo/dom-style';
 import * as fx from 'dojo/fx';
-import * as on from 'dojo/on';
 import * as query from 'dojo/query';
 
 /**
@@ -89,7 +90,7 @@ export default class Sorry extends GameGui {
     //// State Handling
     enteringState_drawCard(args: any): void {
         this.clearPossibleMoves();
-        if (this.isCurrentPlayerActive()) dom.byId('draw-pile')!.classList.add('possible-move');
+        if (this.isCurrentPlayerActive()) domClass.add('draw-pile', 'possible-move');
     }
 
     leavingState_drawCard(): void {
@@ -105,21 +106,22 @@ export default class Sorry extends GameGui {
 
         if (this.isCurrentPlayerActive()) {
             for (let pawnId in args.args.possibleMoves) {
-                dom.byId(`pawn-${args.args.player}-${pawnId}`)!.classList.add('possible-move');
+                domClass.add(`pawn-${args.args.player}-${pawnId}`, 'possible-move');
 
                 for (let location of args.args.possibleMoves[pawnId]) {
                     let locationId = this.getLocationId(location.section, location.color, location.index);
                     let locationElement = dom.byId(locationId)!;
-                    locationElement.classList.add('possible-move-destination');
-                    locationElement.classList.add(`for-pawn-${pawnId}`);
+                    domClass.add(locationElement, 'possible-move-destination');
+                    domClass.add(locationElement, `for-pawn-${pawnId}`);
                 }
             }
 
             if (args.args.selectedMove) {
-                dom.byId(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
-                document
-                    .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
-                    .classList.add('selected-move');
+                domClass.add(`pawn-${args.args.player}-${args.args.selectedMove.id}`, 'selected-move');
+                domClass.add(
+                    this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index),
+                    'selected-move'
+                );
             }
         }
     }
@@ -148,19 +150,20 @@ export default class Sorry extends GameGui {
 
         if (this.isCurrentPlayerActive()) {
             for (let pawnId in args.args.possibleMoves) {
-                dom.byId(`pawn-${args.args.player}-${pawnId}`)!.classList.add('active-pawn', `for-pawn-${pawnId}`);
+                domClass.add(`pawn-${args.args.player}-${pawnId}`, ['active-pawn', `for-pawn-${pawnId}`]);
 
                 for (let location of args.args.possibleMoves[pawnId]) {
                     let locationId = this.getLocationId(location.section, location.color, location.index);
-                    dom.byId(locationId)!.classList.add('possible-move', `for-pawn-${pawnId}`);
+                    domClass.add(locationId, ['possible-move', `for-pawn-${pawnId}`]);
                 }
             }
 
             if (args.args.selectedMove) {
-                dom.byId(`pawn-${args.args.player}-${args.args.selectedMove.id}`)!.classList.add('selected-move');
-                document
-                    .getElementById(this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index))!
-                    .classList.add('selected-move');
+                domClass.add(`pawn-${args.args.player}-${args.args.selectedMove.id}`, 'selected-move');
+                domClass.add(
+                    this.getLocationId(args.args.selectedMove.section, args.args.selectedMove.color, args.args.selectedMove.index),
+                    'selected-move'
+                );
             }
         }
     }
@@ -232,11 +235,11 @@ export default class Sorry extends GameGui {
 
     async notification_shuffleDeck(args: any): Promise<void> {
         console.log('Received notification: shuffleDeck');
-        dom.byId('reveal-card')!.classList.add('hidden');
+        domClass.add('reveal-card', 'hidden');
 
         if (!this.bgaAnimationsActive()) {
-            dom.byId('draw-card')!.classList.remove('hidden');
-            dom.byId('discard-card')!.classList.add('hidden');
+            domClass.remove('draw-card', 'hidden');
+            domClass.add('discard-card', 'hidden');
             return;
         }
 
@@ -252,10 +255,10 @@ export default class Sorry extends GameGui {
             cardFront.dataset['rank'] = ranks[i];
             i++;
         });
-        shuffleCards.classList.add('shuffling');
-        shuffleCards.classList.remove('hidden');
+        domClass.add(shuffleCards, 'shuffling');
+        domClass.remove(shuffleCards, 'hidden');
 
-        dom.byId('discard-card')!.classList.add('hidden');
+        domClass.add('discard-card', 'hidden');
         await this.wait(3000);
     }
 
@@ -301,116 +304,113 @@ export default class Sorry extends GameGui {
      * @param gamedatas Data from the server.
      */
     addBoardPieces(gamedatas: BGA.Gamedatas | any): void {
-        dom.byId('game_play_area')!.insertAdjacentHTML(
-            'beforeend',
-            `
-                <div id="board">
-                    <div id="pawns"></div>
-                </div>
-            `
+        domConstruct.place(
+            `<div id="board">
+                 <div id="pawns"></div>
+             </div>`,
+            'game_play_area',
+            'last'
         );
 
         const board = dom.byId('board')!;
 
         // start spaces
-        board.insertAdjacentHTML(
-            'beforeend',
-            `
-                <div id="start-red" class="circle"></div>
-                <div id="start-blue" class="circle"></div>
-                <div id="start-yellow" class="circle"></div>
-                <div id="start-green" class="circle"></div>
-            `
+        domConstruct.place(
+            `<div id="start-red" class="circle"></div>
+             <div id="start-blue" class="circle"></div>
+             <div id="start-yellow" class="circle"></div>
+             <div id="start-green" class="circle"></div>`,
+            board,
+            'last'
         );
 
         // outer rows
         for (let y = 0; y < 15; y++) {
             const offset = y * 50;
-            board.insertAdjacentHTML(
-                'beforeend',
-                `
-                    <div id="margin-red-${y}" class="square" style="left: ${51 + offset}px; top: 51px;"></div>
-                    <div id="margin-blue-${y}" class="square" style="left: 801px; top: ${51 + offset}px;"></div>
-                    <div id="margin-yellow-${y}" class="square" style="left: ${801 - offset}px; top: 801px;"></div>
-                    <div id="margin-green-${y}" class="square" style="left: 51px; top: ${801 - offset}px;"></div>
-                `
+            domConstruct.place(
+                `<div id="margin-red-${y}" class="square" style="left: ${51 + offset}px; top: 51px;"></div>
+                 <div id="margin-blue-${y}" class="square" style="left: 801px; top: ${51 + offset}px;"></div>
+                 <div id="margin-yellow-${y}" class="square" style="left: ${801 - offset}px; top: 801px;"></div>
+                 <div id="margin-green-${y}" class="square" style="left: 51px; top: ${801 - offset}px;"></div>`,
+                board,
+                'last'
             );
         }
 
         // safety zones
         for (let y = 0; y < 5; y++) {
             const offset = y * 50;
-            board.insertAdjacentHTML(
-                'beforeend',
-                `
-                    <div id="safety-red-${y}" class="square" style="left: 151px; top: ${101 + offset}px;"></div>
-                    <div id="safety-blue-${y}" class="square" style="left: ${751 - offset}px; top: 151px;"></div>
-                    <div id="safety-yellow-${y}" class="square" style="left: 701px; top: ${751 - offset}px;"></div>
-                    <div id="safety-green-${y}" class="square" style="left: ${101 + offset}px; top: 701px;"></div>
-                `
+            domConstruct.place(
+                `<div id="safety-red-${y}" class="square" style="left: 151px; top: ${101 + offset}px;"></div>
+                 <div id="safety-blue-${y}" class="square" style="left: ${751 - offset}px; top: 151px;"></div>
+                 <div id="safety-yellow-${y}" class="square" style="left: 701px; top: ${751 - offset}px;"></div>
+                 <div id="safety-green-${y}" class="square" style="left: ${101 + offset}px; top: 701px;"></div>`,
+                board,
+                'last'
             );
         }
 
         // homes
-        board.insertAdjacentHTML(
-            'beforeend',
-            `
-                <div id="home-red" class="circle"></div>
-                <div id="home-blue" class="circle"></div>
-                <div id="home-yellow" class="circle"></div>
-                <div id="home-green" class="circle"></div>
-            `
+        domConstruct.place(
+            `<div id="home-red" class="circle"></div>
+             <div id="home-blue" class="circle"></div>
+             <div id="home-yellow" class="circle"></div>
+             <div id="home-green" class="circle"></div>`,
+            board,
+            'last'
         );
-        document.querySelectorAll('.square, #home-red, #home-blue, #home-yellow, #home-green').forEach((square) =>
-            square.addEventListener('click', (e) => {
-                const clickedSquare = e.currentTarget as HTMLElement;
-                if (clickedSquare.classList.contains('possible-move') && this.checkAction('actSelectSquare', true))
-                    this.bgaPerformAction('actSelectSquare', {
-                        squareId: clickedSquare.id,
-                    });
-            })
-        );
+        query('.square, #home-red, #home-blue, #home-yellow, #home-green').on('click', (e) => {
+            const clickedSquare = e.currentTarget as HTMLElement;
+            if (domClass.contains(clickedSquare, 'possible-move') && this.checkAction('actSelectSquare', true))
+                this.bgaPerformAction('actSelectSquare', {
+                    squareId: clickedSquare.id,
+                });
+        });
 
         // discard pile
-        board.insertAdjacentHTML(
-            'beforeend',
+        domConstruct.place(
             `<div id="discard-pile" class="card-pile">
-                <div class="card hidden" id="discard-card"></div>
-            </div>`
+                 <div class="card hidden" id="discard-card"></div>
+             </div>`,
+            board,
+            'last'
         );
 
         // draw pile
-        board.insertAdjacentHTML(
-            'beforeend',
+        domConstruct.place(
             `<div id="draw-pile" class="card-pile">
-                <div class="card hidden" data-rank="back" id="draw-card"></div>
-            </div>`
+                 <div class="card hidden" data-rank="back" id="draw-card"></div>
+             </div>`,
+            board,
+            'last'
         );
-        dom.byId('draw-pile')!.addEventListener('click', (e) => {
-            if ((e.currentTarget as HTMLElement).classList.contains('possible-move') && this.checkAction('actDrawCard', true))
+        query('#draw-pile').on('click', (e) => {
+            if (domClass.contains(e.currentTarget as HTMLElement, 'possible-move') && this.checkAction('actDrawCard', true))
                 this.bgaPerformAction('actDrawCard');
         });
 
         // reveal pile
-        board.insertAdjacentHTML('beforeend', `<div id="reveal-pile" class="card-pile"></div>`);
+        domConstruct.place(`<div id="reveal-pile" class="card-pile"></div>`, board, 'last');
 
         // reveal card
-        board.insertAdjacentHTML(
-            'beforeend',
+        domConstruct.place(
             `<div class="hidden" id="reveal-card">
-                <div class="card back" data-rank="back"></div>
-                <div class="card front"></div>
-            </div>`
+                 <div class="card back" data-rank="back"></div>
+                 <div class="card front"></div>
+             </div>`,
+            board,
+            'last'
         );
 
-        board.insertAdjacentHTML('beforeend', `<div id="shuffle-cards" class="card-pile hidden"></div>`);
+        domConstruct.place(`<div id="shuffle-cards" class="card-pile hidden"></div>`, board, 'last');
         for (let rank of [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 'sorry']) {
-            dom.byId('shuffle-cards')!.insertAdjacentHTML(
-                'beforeend',
+            domConstruct.place(
                 `<div class="shuffle-card">
-                    <div class="card back" data-rank="back"></div>
-                    <div class="card front" data-rank="${rank}"></div>
-                </div>`
+                     <div class="card back" data-rank="back"></div>
+                     <div class="card front" data-rank="${rank}"></div>
+                 </div>`,
+                'shuffle-cards',
+                'last'
             );
         }
         {
@@ -418,13 +418,12 @@ export default class Sorry extends GameGui {
             this.shuffleArray(degrees);
 
             let i = 0;
-            document.querySelectorAll('#shuffle-cards .shuffle-card').forEach((card) => {
+            query('#shuffle-cards .shuffle-card').forEach((card) => {
                 const xTranslation = Math.sin((degrees[i]! * Math.PI) / 180) * 100;
                 const yTranslation = Math.cos((degrees[i]! * Math.PI) / 180) * 100;
-                const cardElement = card as HTMLElement;
 
-                cardElement.style.setProperty('--x-translation', `${xTranslation}px`);
-                cardElement.style.setProperty('--y-translation', `${yTranslation}px`);
+                domProp.set(card, '--x-translation', `${xTranslation}px`);
+                domProp.set(card, '--y-translation', `${yTranslation}px`);
 
                 i++;
             });
@@ -436,17 +435,13 @@ export default class Sorry extends GameGui {
         for (let pawn of gamedatas.pawns) {
             let pawnElementId = `pawn-${pawn.player}-${pawn.id}`;
 
-            document
-                .getElementById('pawns')!
-                .insertAdjacentHTML('beforeend', `<div class="pawn" data-color="${pawn.color}" id="${pawnElementId}"></div>`);
+            dom.byId('pawns')!.insertAdjacentHTML('beforeend', `<div class="pawn" data-color="${pawn.color}" id="${pawnElementId}"></div>`);
         }
-        document.querySelectorAll('.pawn').forEach((pawn) =>
-            pawn.addEventListener('click', (e) => {
-                const clickedPawn = e.currentTarget as HTMLElement;
-                if (clickedPawn.classList.contains('possible-move') && this.checkAction('actSelectPawn', true))
-                    this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
-            })
-        );
+        query('.pawn').on('click', (e) => {
+            const clickedPawn = e.currentTarget as HTMLElement;
+            if (domClass.contains(clickedPawn, 'possible-move') && this.checkAction('actSelectPawn', true))
+                this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
+        });
     }
 
     /**
@@ -470,23 +465,23 @@ export default class Sorry extends GameGui {
         }
 
         if (cards.nextCard) {
-            dom.byId('draw-card')!.classList.remove('hidden');
+            domClass.remove('draw-card', 'hidden');
         } else {
-            dom.byId('draw-card')!.classList.add('hidden');
+            domClass.add('draw-card', 'hidden');
         }
 
         if (cards.revealCard) {
             domClass.remove('reveal-card', 'hidden');
             this.drawCard(cards.revealCard);
         } else {
-            dom.byId('reveal-card')!.classList.add('hidden');
+            domClass.add('reveal-card', 'hidden');
         }
 
         if (cards.lastCard) {
-            dom.byId('discard-card')!.classList.remove('hidden');
-            dom.byId('discard-card')!.dataset['rank'] = cards.lastCard;
+            domClass.remove('discard-card', 'hidden');
+            domAttr.set('discard-card', 'data-rank', cards.lastCard);
         } else {
-            dom.byId('discard-card')!.classList.add('hidden');
+            domClass.add('discard-card', 'hidden');
         }
     }
 
@@ -568,10 +563,10 @@ export default class Sorry extends GameGui {
 
     shuffleCardsAnimationStopped(e: AnimationEvent): void {
         let shuffleCards = e.currentTarget as HTMLElement;
-        if (shuffleCards.classList.contains('shuffling')) {
-            shuffleCards.classList.remove('shuffling');
-            shuffleCards.classList.add('hidden');
-            dom.byId('draw-card')!.classList.remove('hidden');
+        if (domClass.contains(shuffleCards, 'shuffling')) {
+            domClass.remove(shuffleCards, 'shuffling');
+            domClass.add(shuffleCards, 'hidden');
+            domClass.remove('draw-card', 'hidden');
         }
     }
 
@@ -619,12 +614,9 @@ export default class Sorry extends GameGui {
             return numericValue;
         }
 
-        let tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = dimension;
-        document.body.appendChild(tempDiv);
-        let pixels = tempDiv.offsetLeft;
-        document.body.removeChild(tempDiv);
+        const tempDiv = domConstruct.create('div', {position: 'absolute', left: dimension}, document.body);
+        const pixels = domProp.get(tempDiv, 'offsetLeft');
+        domConstruct.destroy(tempDiv);
 
         return pixels;
     }
@@ -678,7 +670,7 @@ export default class Sorry extends GameGui {
             duration: move.durationMilliseconds,
             easing: (x) => 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866,
             beforeBegin: () => {
-                domStyle.set(move.pawn, {zIndex: '2'});
+                domStyle.set(move.pawn, {zIndex: '4'});
                 if (move.moveType === 'jump') {
                     domStyle.set(move.pawn, {
                         animationDuration: `${move.durationMilliseconds}ms`,
