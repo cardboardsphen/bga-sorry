@@ -558,7 +558,7 @@ class Game extends \Table {
             $found7sAddendPair = false;
             $otherMoves = array_filter($moves, fn($otherMove) => $otherMove->pawn->id != $move->pawn->id);
             foreach ($otherMoves as $otherMove) {
-                if ($move->numberOfSteps + $otherMove->numberOfSteps == 7 && ($move->destination->section !== $otherMove->destination->section || $move->destination->color !== $otherMove->destination->color || $move->destination->index != $otherMove->destination->index))
+                if ($move->numberOfSteps + $otherMove->numberOfSteps == 7 && ($move->destination->section === BoardSection::home || $move->destination->section !== $otherMove->destination->section || $move->destination->color !== $otherMove->destination->color || $move->destination->index != $otherMove->destination->index))
                     $found7sAddendPair = true;
             }
             if (!$found7sAddendPair)
