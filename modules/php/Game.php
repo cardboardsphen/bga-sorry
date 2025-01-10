@@ -146,6 +146,7 @@ class Game extends \Table {
                 'rank' => $rank,
             ]
         );
+        $this->notifyAllPlayers('simplePause', '', ['time' => 1500]); // give a second to ensure draw animation has finished
 
         if ($rank != 7)
             $this->determineAllPossibleMoves();
@@ -159,7 +160,6 @@ class Game extends \Table {
             return;
         }
 
-        $this->notifyAllPlayers('simplePause', '', ['time' => 1500]); // give a second to ensure draw animation has finished
         $this->notifyAllPlayers(
             'message',
             clienttranslate('${player_name} has no valid moves for ${rank} card.'),
@@ -868,6 +868,7 @@ class Game extends \Table {
                 [
                     'move' => [
                         'moveType' => $move['moveType'],
+                        'durationSeconds' => $move['durationSeconds'],
                         'durationSecondsPerSquare' => $move['durationSecondsPerSquare'] ?? 1,
                         'playerId' => $move['move']->pawn->playerId,
                         'pawnId' => $move['move']->pawn->id,
@@ -877,6 +878,7 @@ class Game extends \Table {
                     ],
                     'otherMoves' => array_map(fn($otherMove) => [
                         'moveType' => $otherMove['moveType'],
+                        'durationSeconds' => $otherMove['durationSeconds'],
                         'durationSecondsPerSquare' => $otherMove['durationSecondsPerSquare'] ?? 1,
                         'startMoveAtPercentage' => $otherMove['startMoveAtPercentage'] ?? 0,
                         'playerId' => $otherMove['move']->pawn->playerId,
@@ -899,13 +901,13 @@ class Game extends \Table {
             ],
             [
                 'moveType' => 'jump',
-                'durationSecondsPerSquare' => 0.5,
+                'durationSeconds' => 2.5,
                 'move' => $move
             ],
             [
                 'moveType' => 'jump',
-                'durationSecondsPerSquare' => 0.25,
-                'startMoveAtPercentage' => 80,
+                'durationSeconds' => 2,
+                'startMoveAtPercentage' => 70,
                 'move' => Move::create($bumpedPawn, BoardLocation::create('start', $bumpedPawn->color->name, null))
             ]
         );

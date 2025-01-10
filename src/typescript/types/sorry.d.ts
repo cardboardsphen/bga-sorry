@@ -1,5 +1,6 @@
 type SinglePawnMoveArgs = {
     moveType: string;
+    durationSeconds: string;
     durationSecondsPerSquare: string;
     startMoveAtPercentage: string;
     playerId: number;

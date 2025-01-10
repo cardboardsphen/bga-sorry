@@ -711,8 +711,11 @@ export default class Sorry extends GameGui {
 
         const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, move.pawnId, move.section, move.color, move.index);
 
-        const distance = Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50;
-        const duration = parseFloat(move.durationSecondsPerSquare) * 1000 * distance;
+        const duration =
+            move.durationSeconds !== undefined
+                ? parseFloat(move.durationSeconds) * 1000
+                : parseFloat(move.durationSecondsPerSquare) * 1000 * (Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50);
+
         return {
             pawn: pawn,
             moveType: move.moveType,
@@ -744,7 +747,7 @@ export default class Sorry extends GameGui {
             delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
             duration: move.durationMilliseconds,
             easing: (x) => 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866,
-            beforeBegin: () => {
+            onBegin: () => {
                 domStyle.set(move.pawn, {zIndex: '4'});
                 if (move.moveType === 'jump') {
                     domStyle.set(move.pawn, {
@@ -761,7 +764,6 @@ export default class Sorry extends GameGui {
     }
 
     playAllAnimations(animations: DojoJS.Animation[]): Promise<void> {
-        console.log('starting animation');
         return new Promise<void>((resolve) => {
             const animation = fx.combine(animations);
             dojo.connect(animation, 'onEnd', () => resolve());
