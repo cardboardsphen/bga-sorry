@@ -309,84 +309,24 @@
     }
 }
 
-@keyframes shuffle-card {
-    0% {
-        transform: none;
-        animation-timing-function: ease-in;
-    }
-    30% {
-        transform: scale(1.4) translate3d(-10px, 20px, 50px) rotate(60deg);
-    }
-    65% {
-        transform: scale(1.4) translate3d(20px, 30px, 50px) rotate(120deg);
-    }
-    100% {
-        transform: translate3d(46px, 46px, 0) rotate(180deg);
-        animation-timing-function: ease-out;
-    }
-}
-@keyframes shuffle-card-front {
-    0% {
-        transform: none;
-    }
-    40% {
-        transform: translate(var(--x-translation), var(--y-translation));
-    }
-    80% {
-        transform: none;
-    }
-    100% {
-        transform: rotateY(-180deg);
-    }
-}
-@keyframes shuffle-card-back {
-    0% {
-        transform: rotateY(180deg);
-    }
-    40% {
-        transform: translate(var(--x-translation), var(--y-translation)) rotateY(180deg);
-    }
-    80% {
-        transform: rotateY(180deg);
-    }
-    100% {
-        transform: none;
-    }
-}
 #shuffle-cards {
-    left: 377px;
-    top: 573px;
-    width: 96px;
-    height: 146px;
+    width: 150px;
+    height: 100px;
     position: absolute;
+    transform-origin: center;
     transform: rotate(-90deg);
-    transform-origin: top left;
     z-index: 3;
 
     .shuffle-card {
-        transform-origin: 100px 50px;
+        width: 96px;
+        height: 146px;
+        top: -23px;
+        left: 27px;
+        position: absolute;
+        transform-origin: center;
 
         .card {
-            left: 0px;
-            top: 0px;
-            transform: none;
-            transform-origin: center;
             backface-visibility: hidden;
-
-            &.back {
-                transform: rotateY(180deg);
-            }
-        }
-    }
-
-    &.shuffling .shuffle-card {
-        animation: shuffle-card 3s linear forwards;
-
-        .front {
-            animation: shuffle-card-front 3s linear forwards;
-        }
-        .back {
-            animation: shuffle-card-back 3s linear forwards;
         }
     }
 }

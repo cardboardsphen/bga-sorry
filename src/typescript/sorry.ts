@@ -98,7 +98,11 @@ export default class Sorry extends GameGui {
     }
 
     updateActionButtons_drawCard(args: any): void {
-        if (this.isCurrentPlayerActive()) this.addActionButton('draw-card-btn', 'Draw a Card', () => this.bgaPerformAction('actDrawCard'));
+        if (this.isCurrentPlayerActive())
+            this.addActionButton('draw-card-btn', 'Draw a Card', () => {
+                this.clearPossibleMoves();
+                this.bgaPerformAction('actDrawCard');
+            });
     }
 
     enteringState_selectPawn(args: any): void {
@@ -238,28 +242,127 @@ export default class Sorry extends GameGui {
         domClass.add('reveal-card', 'hidden');
 
         if (!this.bgaAnimationsActive()) {
+            domClass.add('shuffle-cards', 'hidden');
             domClass.remove('draw-card', 'hidden');
             domClass.add('discard-card', 'hidden');
             return;
         }
 
-        const shuffleCards = dom.byId('shuffle-cards')!;
+        const cardPile = dom.byId('shuffle-cards')!;
+        const cards = query('.shuffle-card', cardPile);
+        const fronts = query('.card.front', cardPile);
+        const backs = query('.card.back', cardPile);
+
+        // shuffle shuffle cards
         let ranks = ['1', '2', '3', '4', '5', '7', '8', '10', '11', '12', 'sorry'];
         ranks = ranks.filter((r) => r != args.rank);
         this.shuffleArray(ranks);
         ranks.push(args.rank);
+        for (let i = 0; i < 11; i++) domAttr.set(fronts[i]!, 'data-rank', ranks[i]!);
 
-        let i = 0;
-        shuffleCards.querySelectorAll('.card.front').forEach((card) => {
-            let cardFront = card as HTMLElement;
-            cardFront.dataset['rank'] = ranks[i];
-            i++;
-        });
-        domClass.add(shuffleCards, 'shuffling');
-        domClass.remove(shuffleCards, 'hidden');
-
+        cards.style('transform', '');
+        cards.style('zIndex', '3');
+        backs.style('transform', 'rotateY(180deg)');
+        fronts.style('transform', '');
+        domClass.remove(cardPile, 'hidden');
+        this.placeOnObject(cardPile, 'discard-pile');
         domClass.add('discard-card', 'hidden');
-        await this.wait(3000);
+
+        let animations: DojoJS.Animation[] = [];
+        animations.push(this.slideToObject(cardPile, 'draw-pile', 3000));
+        cards.forEach((card) => {
+            const front = query('.front', card)[0]!;
+            const back = query('.back', card)[0]!;
+
+            let maxAngle = Math.floor(Math.random() * 800);
+            let finalAngle = Math.ceil(maxAngle / 360) * 360 + 360;
+            if (Math.random() < 0.5) {
+                maxAngle *= -1;
+                finalAngle *= -1;
+            }
+            const maxX = Math.floor(Math.random() * 800) - 400;
+            const maxY = Math.floor(Math.random() * 800) - 400;
+            animations.push(
+                fx.chain([
+                    dojo.animateProperty({
+                        node: card,
+                        properties: {
+                            angle: {start: 0, end: maxAngle},
+                            x: {start: 0, end: maxX},
+                            y: {start: 0, end: maxY},
+                            z: {start: 0, end: 50},
+                            scale: {start: 1, end: 1.4},
+                        },
+                        duration: 1000,
+                        easing: fx.easing.sineIn,
+                        onAnimate: (p: any) =>
+                            domStyle.set(
+                                card,
+                                'transform',
+                                `translate3d(${p.x}, ${p.y}, ${p.z}) scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`
+                            ),
+                    }),
+                    dojo.animateProperty({
+                        node: card,
+                        duration: 0,
+                        onEnd: () => domStyle.set(card, 'zIndex', `${Math.ceil(Math.random() * 15) - 4}`),
+                    }),
+                    dojo.animateProperty({
+                        node: card,
+                        properties: {
+                            angle: {start: maxAngle, end: finalAngle},
+                            x: {start: maxX, end: 0},
+                            y: {start: maxY, end: 0},
+                            z: {start: 50, end: 100},
+                            scale: {start: 1.4, end: 1.8},
+                        },
+                        duration: 1400,
+                        easing: fx.easing.sineOut,
+                        onAnimate: (p: any) =>
+                            domStyle.set(
+                                card,
+                                'transform',
+                                `translate3d(${p.x}, ${p.y}, ${p.z}) scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`
+                            ),
+                    }),
+                    dojo.animateProperty({
+                        node: card,
+                        properties: {
+                            z: {start: 100, end: 0},
+                            scale: {start: 1.8, end: 1},
+                        },
+                        duration: 600,
+                        easing: fx.easing.quadIn,
+                        onAnimate: (p: any) => domStyle.set(card, 'transform', `translate3d(0, 0, ${p.z}) scale(${p.scale.slice(0, -2)})`),
+                    }),
+                ])
+            );
+            animations.push(
+                dojo.animateProperty({
+                    node: front,
+                    properties: {rotateY: {start: 0, end: 180}},
+                    duration: 600,
+                    delay: 2400,
+                    easing: fx.easing.quadIn,
+                    onAnimate: (p: any) => domStyle.set(front, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                })
+            );
+            animations.push(
+                dojo.animateProperty({
+                    node: back,
+                    properties: {rotateY: {start: 180, end: 0}},
+                    duration: 600,
+                    delay: 2400,
+                    easing: fx.easing.quadIn,
+                    onAnimate: (p: any) => domStyle.set(back, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                })
+            );
+        });
+
+        await this.playAllAnimations(animations).finally(() => {
+            domClass.remove('draw-card', 'hidden');
+            domClass.add(cardPile, 'hidden');
+        });
     }
 
     async notification_movePawns(args: PawnMoveArgs): Promise<void> {
@@ -279,14 +382,9 @@ export default class Sorry extends GameGui {
         animations.push(this.getPawnMoveAnimation(move));
         for (let otherMove of otherMoves) animations.push(this.getPawnMoveAnimation(otherMove, move.durationMilliseconds));
 
-        await this.playAllAnimations(animations)
-            .catch((error) => {
-                this.movePawnDirectly(move);
-                for (let otherMove of otherMoves) this.movePawnDirectly(otherMove);
-            })
-            .finally(() => {
-                query('.jumpping').removeClass('jumpping');
-            });
+        await this.playAllAnimations(animations).finally(() => {
+            query('.jumpping').removeClass('jumpping');
+        });
     }
 
     async notification_score(args: any): Promise<void> {
@@ -385,8 +483,10 @@ export default class Sorry extends GameGui {
             'last'
         );
         query('#draw-pile').on('click', (e) => {
-            if (domClass.contains(e.currentTarget as HTMLElement, 'possible-move') && this.checkAction('actDrawCard', true))
+            if (domClass.contains(e.currentTarget as HTMLElement, 'possible-move')) {
+                this.clearPossibleMoves();
                 this.bgaPerformAction('actDrawCard');
+            }
         });
 
         // reveal pile
@@ -402,7 +502,8 @@ export default class Sorry extends GameGui {
             'last'
         );
 
-        domConstruct.place(`<div id="shuffle-cards" class="card-pile hidden"></div>`, board, 'last');
+        // cards for shuffle animation
+        domConstruct.place(`<div id="shuffle-cards" class="hidden"></div>`, board, 'last');
         for (let rank of [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 'sorry']) {
             domConstruct.place(
                 `<div class="shuffle-card">
@@ -413,23 +514,6 @@ export default class Sorry extends GameGui {
                 'last'
             );
         }
-        {
-            let degrees = [0, 35, 70, 105, 140, 175, 210, 245, 280, 315, 350];
-            this.shuffleArray(degrees);
-
-            let i = 0;
-            query('#shuffle-cards .shuffle-card').forEach((card) => {
-                const xTranslation = Math.sin((degrees[i]! * Math.PI) / 180) * 100;
-                const yTranslation = Math.cos((degrees[i]! * Math.PI) / 180) * 100;
-
-                domProp.set(card, '--x-translation', `${xTranslation}px`);
-                domProp.set(card, '--y-translation', `${yTranslation}px`);
-
-                i++;
-            });
-        }
-        dom.byId('shuffle-cards')!.addEventListener('animationend', this.shuffleCardsAnimationStopped.bind(this));
-        dom.byId('shuffle-cards')!.addEventListener('animationcancel', this.shuffleCardsAnimationStopped.bind(this));
 
         // create pawns
         for (let pawn of gamedatas.pawns) {
@@ -472,7 +556,7 @@ export default class Sorry extends GameGui {
 
         if (cards.revealCard) {
             domClass.remove('reveal-card', 'hidden');
-            this.drawCard(cards.revealCard);
+            this.drawCard(cards.revealCard, false);
         } else {
             domClass.add('reveal-card', 'hidden');
         }
@@ -491,7 +575,7 @@ export default class Sorry extends GameGui {
         return destinationId;
     }
 
-    drawCard(rank: string) {
+    drawCard(rank: string, animate: boolean = true) {
         let card = dom.byId('reveal-card')!;
         let frontFace = query('.front', card)[0]!;
         let backFace = query('.back', card)[0]!;
@@ -499,7 +583,7 @@ export default class Sorry extends GameGui {
         domAttr.set(frontFace, 'data-rank', rank);
         domClass.remove(card, 'hidden');
 
-        if (!this.bgaAnimationsActive()) {
+        if (!this.bgaAnimationsActive() || !animate) {
             this.placeOnObject(card, 'reveal-pile');
             domStyle.set(card, 'transform', 'scale(1.8)');
             domStyle.set(frontFace, 'transform', 'none');
@@ -559,15 +643,6 @@ export default class Sorry extends GameGui {
         );
 
         this.playAllAnimations(animations);
-    }
-
-    shuffleCardsAnimationStopped(e: AnimationEvent): void {
-        let shuffleCards = e.currentTarget as HTMLElement;
-        if (domClass.contains(shuffleCards, 'shuffling')) {
-            domClass.remove(shuffleCards, 'shuffling');
-            domClass.add(shuffleCards, 'hidden');
-            domClass.remove('draw-card', 'hidden');
-        }
     }
 
     /**
