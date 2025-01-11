@@ -9,10 +9,12 @@ type SinglePawnMoveArgs = {
     color: string;
     index: string;
 };
+
 type PawnMoveArgs = {
     move: SinglePawnMoveArgs;
     otherMoves: SinglePawnMoveArgs[];
 };
+
 type PawnMove = {
     pawn: HTMLElement;
     moveType: string;

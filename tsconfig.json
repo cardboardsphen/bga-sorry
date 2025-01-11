@@ -14,7 +14,7 @@
 
 
     // Source Map
-    "sourceMap": false,                               /* enables the use of source maps for debuggers and error reporting etc */
+    "sourceMap": false,                              /* enables the use of source maps for debuggers and error reporting etc */
 
     /* Emit */
     "outFile": "sorry.js",                           /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
@@ -31,5 +31,5 @@
     "noImplicitOverride": true,                      /* Ensure overriding members in derived classes are marked with an override modifier. */
   },
 
-  "include": ["src/typescript/**/*"]
+  "include": ["src/typescript/**/*.ts"]
 }
