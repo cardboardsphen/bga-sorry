@@ -28,6 +28,7 @@ import * as domConstruct from 'dojo/dom-construct';
 import * as domProp from 'dojo/dom-prop';
 import * as domStyle from 'dojo/dom-style';
 import * as fx from 'dojo/fx';
+import * as gfx from 'dojox/gfx';
 import * as query from 'dojo/query';
 
 /**
