@@ -868,7 +868,7 @@ class Game extends \Table {
                 [
                     'move' => [
                         'moveType' => $move['moveType'],
-                        'durationSeconds' => $move['durationSeconds'],
+                        'durationSeconds' => $move['durationSeconds'] ?? null,
                         'durationSecondsPerSquare' => $move['durationSecondsPerSquare'] ?? 1,
                         'playerId' => $move['move']->pawn->playerId,
                         'pawnId' => $move['move']->pawn->id,
