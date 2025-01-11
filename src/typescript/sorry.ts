@@ -207,7 +207,7 @@ export default class Sorry extends GameGui {
         let card = dom.byId('reveal-card')!;
         query('.front', card).attr('data-rank', args.rank);
 
-        if (!this.bgaAnimationsActive()) {
+        if (!this.bgaAnimationsActive() || domClass.contains(card, 'hidden')) {
             domAttr.set('discard-card', 'data-rank', args.rank);
             domClass.remove('discard-card', 'hidden');
             domClass.add(card, 'hidden');
@@ -222,12 +222,13 @@ export default class Sorry extends GameGui {
                 node: card,
                 properties: {
                     transformRotate: {start: 0, end: -90, units: 'deg'},
+                    translateZ: {start: 100, end: 0, unts: 'px'},
                     transformScale: {start: 1.8, end: 1, units: ' '},
                 },
-                duration: this.bgaAnimationsActive() && !domClass.contains(card, 'hidden') ? 2000 : 0,
+                duration: 2000,
                 easing: fx.easing.linear,
                 onAnimate(p: any) {
-                    domStyle.set(card, 'transform', `scale(${p.transformScale}) rotate(${p.transformRotate})`);
+                    domStyle.set(card, 'transform', `scale(${p.transformScale}) translateZ(${p.translateZ}) rotate(${p.transformRotate})`);
                 },
                 onEnd() {
                     domAttr.set('discard-card', 'data-rank', args.rank);
@@ -350,7 +351,7 @@ export default class Sorry extends GameGui {
             animations.push(
                 dojo.animateProperty({
                     node: front,
-                    properties: {rotateY: {start: 0, end: 180, units: 'deg'}},
+                    properties: {rotateY: {start: 0, end: -180, units: 'deg'}},
                     duration: 600,
                     delay: 2400,
                     easing: fx.easing.quadIn,
@@ -599,7 +600,7 @@ export default class Sorry extends GameGui {
 
         if (!this.bgaAnimationsActive() || !animate) {
             this.placeOnObject(card, 'reveal-pile');
-            domStyle.set(card, 'transform', 'scale(1.8)');
+            domStyle.set(card, 'transform', 'translateZ(100px) scale(1.8)');
             domStyle.set(frontFace, 'transform', 'none');
             domStyle.set(backFace, 'transform', 'rotateY(-180deg)');
             return;
@@ -614,24 +615,38 @@ export default class Sorry extends GameGui {
         const liftCard = fx.chain([
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1, end: 1.4, units: ' '}, transformRotate: {start: -90, end: -90, units: 'deg'}},
+                properties: {
+                    transformScale: {start: 1, end: 1.4, units: ' '},
+                    translateZ: {start: 0, end: 33, units: 'px'},
+                    transformRotate: {start: -90, end: -90, units: 'deg'},
+                },
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1.4, end: 1.6, units: ' '}, transformRotate: {start: -90, end: -45, units: 'deg'}},
+                properties: {
+                    transformScale: {start: 1.4, end: 1.6, units: ' '},
+                    translateZ: {start: 33, end: 67, units: 'px'},
+                    transformRotate: {start: -90, end: -45, units: 'deg'},
+                },
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1.6, end: 1.8, units: ' '}, transformRotate: {start: -45, end: 0, units: 'deg'}},
+                properties: {
+                    transformScale: {start: 1.6, end: 1.8, units: ' '},
+                    translateZ: {start: 67, end: 100, units: 'px'},
+                    transformRotate: {start: -45, end: 0, units: 'deg'},
+                },
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
         ]);
-        dojo.connect(liftCard, 'onAnimate', (p: any) => domStyle.set(card, 'transform', `scale(${p.transformScale}) rotate(${p.transformRotate})`));
+        dojo.connect(liftCard, 'onAnimate', (p: any) =>
+            domStyle.set(card, 'transform', `scale(${p.transformScale}) translateZ(${p.translateZ}) rotate(${p.transformRotate})`)
+        );
         animations.push(liftCard);
         animations.push(
             dojo.animateProperty({
