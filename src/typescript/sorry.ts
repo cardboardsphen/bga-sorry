@@ -213,19 +213,22 @@ export default class Sorry extends GameGui {
             return;
         }
 
+        domStyle.set(card, 'transform', '');
         const animations: DojoJS.Animation[] = [];
         animations.push(this.slideToObject(card, 'discard-pile', 2000));
         animations.push(
             dojo.animateProperty({
                 node: card,
                 properties: {
-                    angle: {start: 0, end: -90},
-                    scale: {start: 1.8, end: 1},
+                    transformRotate: {start: 0, end: -90, units: 'deg'},
+                    transformScale: {start: 1.8, end: 1, units: ' '},
                 },
                 duration: this.bgaAnimationsActive() && !domClass.contains(card, 'hidden') ? 2000 : 0,
                 easing: fx.easing.linear,
-                onAnimate: (p: any) => domStyle.set(card, 'transform', `scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`),
-                onEnd: () => {
+                onAnimate(p: any) {
+                    domStyle.set(card, 'transform', `scale(${p.transformScale}) rotate(${p.transformRotate})`);
+                },
+                onEnd() {
                     domAttr.set('discard-card', 'data-rank', args.rank);
                     domClass.remove('discard-card', 'hidden');
                     domClass.add(card, 'hidden');
@@ -287,74 +290,84 @@ export default class Sorry extends GameGui {
                     dojo.animateProperty({
                         node: card,
                         properties: {
-                            angle: {start: 0, end: maxAngle},
-                            x: {start: 0, end: maxX},
-                            y: {start: 0, end: maxY},
-                            z: {start: 0, end: 50},
-                            scale: {start: 1, end: 1.4},
+                            transformRotate: {start: 0, end: maxAngle, units: 'deg'},
+                            translateX: {start: 0, end: maxX, units: 'px'},
+                            translateY: {start: 0, end: maxY, units: 'px'},
+                            translateZ: {start: 0, end: 50, units: 'px'},
+                            transformScale: {start: 1, end: 1.4, units: ' '},
                         },
                         duration: 1000,
                         easing: fx.easing.sineIn,
-                        onAnimate: (p: any) =>
+                        onAnimate(p: any) {
                             domStyle.set(
                                 card,
                                 'transform',
-                                `translate3d(${p.x}, ${p.y}, ${p.z}) scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`
-                            ),
+                                `translate3d(${p.translateX}, ${p.translateY}, ${p.translateZ}) scale(${p.transformScale}) rotate(${p.transformRotate})`
+                            );
+                        },
                     }),
                     dojo.animateProperty({
                         node: card,
                         duration: 0,
-                        onEnd: () => domStyle.set(card, 'zIndex', `${Math.ceil(Math.random() * 15) - 4}`),
+                        onEnd() {
+                            domStyle.set(card, 'zIndex', `${Math.ceil(Math.random() * 15) - 4}`);
+                        },
                     }),
                     dojo.animateProperty({
                         node: card,
                         properties: {
-                            angle: {start: maxAngle, end: finalAngle},
-                            x: {start: maxX, end: 0},
-                            y: {start: maxY, end: 0},
-                            z: {start: 50, end: 100},
-                            scale: {start: 1.4, end: 1.8},
+                            transformRotate: {start: maxAngle, end: finalAngle, units: 'deg'},
+                            translateX: {start: maxX, end: 0, units: 'px'},
+                            translateY: {start: maxY, end: 0, units: 'px'},
+                            translateZ: {start: 50, end: 100, units: 'px'},
+                            transformScale: {start: 1.4, end: 1.8, units: ' '},
                         },
                         duration: 1400,
                         easing: fx.easing.sineOut,
-                        onAnimate: (p: any) =>
+                        onAnimate(p: any) {
                             domStyle.set(
                                 card,
                                 'transform',
-                                `translate3d(${p.x}, ${p.y}, ${p.z}) scale(${p.scale.slice(0, -2)}) rotate(${p.angle.slice(0, -2)}deg)`
-                            ),
+                                `translate3d(${p.translateX}, ${p.translateY}, ${p.translateZ}) scale(${p.transformScale}) rotate(${p.transformRotate})`
+                            );
+                        },
                     }),
                     dojo.animateProperty({
                         node: card,
                         properties: {
-                            z: {start: 100, end: 0},
-                            scale: {start: 1.8, end: 1},
+                            translateZ: {start: 100, end: 0, units: 'px'},
+                            transformScale: {start: 1.8, end: 1, units: ' '},
                         },
                         duration: 600,
                         easing: fx.easing.quadIn,
-                        onAnimate: (p: any) => domStyle.set(card, 'transform', `translate3d(0, 0, ${p.z}) scale(${p.scale.slice(0, -2)})`),
+                        onAnimate(p: any) {
+                            domStyle.set(card, 'transform', `translate3d(0, 0, ${p.translateZ}) scale(${p.transformScale})`);
+                        },
                     }),
                 ])
             );
             animations.push(
                 dojo.animateProperty({
                     node: front,
-                    properties: {rotateY: {start: 0, end: 180}},
+                    properties: {rotateY: {start: 0, end: 180, units: 'deg'}},
                     duration: 600,
                     delay: 2400,
                     easing: fx.easing.quadIn,
-                    onAnimate: (p: any) => domStyle.set(front, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                    onAnimate(p: any) {
+                        domStyle.set(front, 'transform', `rotateY(${p.rotateY})`);
+                    },
                 })
             );
             animations.push(
                 dojo.animateProperty({
                     node: back,
-                    properties: {rotateY: {start: 180, end: 0}},
+                    properties: {rotateY: {start: 180, end: 0, units: 'deg'}},
                     duration: 600,
                     delay: 2400,
                     easing: fx.easing.quadIn,
-                    onAnimate: (p: any) => domStyle.set(back, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                    onAnimate(p: any) {
+                        domStyle.set(back, 'transform', `rotateY(${p.rotateY})`);
+                    },
                 })
             );
         });
@@ -600,45 +613,47 @@ export default class Sorry extends GameGui {
         const liftCard = fx.chain([
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1, end: 1.4}, transformRotate: {start: -90, end: -90}},
+                properties: {transformScale: {start: 1, end: 1.4, units: ' '}, transformRotate: {start: -90, end: -90, units: 'deg'}},
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1.4, end: 1.6}, transformRotate: {start: -90, end: -45}},
+                properties: {transformScale: {start: 1.4, end: 1.6, units: ' '}, transformRotate: {start: -90, end: -45, units: 'deg'}},
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
             dojo.animateProperty({
                 node: card,
-                properties: {transformScale: {start: 1.6, end: 1.8}, transformRotate: {start: -45, end: 0}},
+                properties: {transformScale: {start: 1.6, end: 1.8, units: ' '}, transformRotate: {start: -45, end: 0, units: 'deg'}},
                 duration: 1000,
                 easing: fx.easing.linear,
             }),
         ]);
-        dojo.connect(liftCard, 'onAnimate', (p: any) =>
-            domStyle.set(card, 'transform', `scale(${p.transformScale.slice(0, -2)}) rotate(${p.transformRotate.slice(0, -2)}deg)`)
-        );
+        dojo.connect(liftCard, 'onAnimate', (p: any) => domStyle.set(card, 'transform', `scale(${p.transformScale}) rotate(${p.transformRotate})`));
         animations.push(liftCard);
         animations.push(
             dojo.animateProperty({
                 node: frontFace,
-                properties: {rotateY: {start: 180, end: 0}},
+                properties: {rotateY: {start: 180, end: 0, units: 'deg'}},
                 duration: 2000,
                 delay: 1000,
                 easing: fx.easing.linear,
-                onAnimate: (p: any) => domStyle.set(frontFace, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                onAnimate(p: any) {
+                    domStyle.set(frontFace, 'transform', `rotateY(${p.rotateY})`);
+                },
             })
         );
         animations.push(
             dojo.animateProperty({
                 node: backFace,
-                properties: {rotateY: {start: 0, end: -180}},
+                properties: {rotateY: {start: 0, end: -180, units: 'deg'}},
                 duration: 2000,
                 delay: 1000,
                 easing: fx.easing.linear,
-                onAnimate: (p: any) => domStyle.set(backFace, 'transform', `rotateY(${p.rotateY.slice(0, -2)}deg)`),
+                onAnimate(p: any) {
+                    domStyle.set(backFace, 'transform', `rotateY(${p.rotateY})`);
+                },
             })
         );
 
@@ -746,8 +761,10 @@ export default class Sorry extends GameGui {
             },
             delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
             duration: move.durationMilliseconds,
-            easing: (x) => 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866,
-            onBegin: () => {
+            easing(x) {
+                return 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866;
+            },
+            onBegin() {
                 domStyle.set(move.pawn, {zIndex: '4'});
                 if (move.moveType === 'jump') {
                     domStyle.set(move.pawn, {
@@ -756,7 +773,7 @@ export default class Sorry extends GameGui {
                     domClass.add(move.pawn, 'jumpping');
                 }
             },
-            onEnd: () => {
+            onEnd() {
                 domClass.remove(move.pawn, 'jumpping');
                 domStyle.set(move.pawn, {zIndex: ''});
             },
