@@ -743,7 +743,7 @@ export default class Sorry extends GameGui {
         const [offsetLeft, offsetTop] = this.getPawnOffsetInPixelsToLocation(pawn, move.pawnId, move.section, move.color, move.index);
 
         const duration =
-            move.durationSeconds !== undefined
+            move.durationSeconds !== null
                 ? parseFloat(move.durationSeconds) * 1000
                 : parseFloat(move.durationSecondsPerSquare) * 1000 * (Math.sqrt(offsetLeft ** 2 + offsetTop ** 2) / 50);
 

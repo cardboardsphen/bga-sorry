@@ -868,7 +868,7 @@ class Game extends \Table {
                 [
                     'move' => [
                         'moveType' => $move['moveType'],
-                        'durationSeconds' => $move['durationSeconds'] ?? null,
+                        'durationSeconds' => @$move['durationSeconds'],
                         'durationSecondsPerSquare' => $move['durationSecondsPerSquare'] ?? 1,
                         'playerId' => $move['move']->pawn->playerId,
                         'pawnId' => $move['move']->pawn->id,
@@ -878,7 +878,7 @@ class Game extends \Table {
                     ],
                     'otherMoves' => array_map(fn($otherMove) => [
                         'moveType' => $otherMove['moveType'],
-                        'durationSeconds' => $otherMove['durationSeconds'],
+                        'durationSeconds' => @$otherMove['durationSeconds'],
                         'durationSecondsPerSquare' => $otherMove['durationSecondsPerSquare'] ?? 1,
                         'startMoveAtPercentage' => $otherMove['startMoveAtPercentage'] ?? 0,
                         'playerId' => $otherMove['move']->pawn->playerId,
