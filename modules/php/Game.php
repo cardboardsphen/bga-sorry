@@ -8,6 +8,10 @@
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
+ * 
+ * Full source available at https://github.com/cardboardsphen/bga-sorry
+ * 
+ * -----
  *
  * Game.php
  *
@@ -25,7 +29,6 @@ require_once("autoload.php");
 
 use \stdClass;
 
-use \Bga\GameFramework\Actions\CheckAction;
 use \BgaUserException;
 
 use \Bga\Games\Sorry\Helpers\DatabaseHelpers;

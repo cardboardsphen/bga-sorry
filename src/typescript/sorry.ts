@@ -1,20 +1,3 @@
-/**
- *------
- * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * Sorry implementation : © cardboardsphen, bga-dev@sphen.com
- *
- * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
- * See http://en.boardgamearena.com/#!doc/Studio for more information.
- * -----
- *
- * sorry.js
- *
- * Sorry user interface script
- *
- * In this file, you are describing the logic of your user interface, in Javascript language.
- *
- */
-
 /// <amd-module name="bgagame/sorry"/>
 /// <reference path="./types/all-bga-types.d.ts"/>
 
