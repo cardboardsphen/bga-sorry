@@ -11,8 +11,9 @@ import * as domConstruct from 'dojo/dom-construct';
 import * as domProp from 'dojo/dom-prop';
 import * as domStyle from 'dojo/dom-style';
 import * as fx from 'dojo/fx';
-import * as gfx from 'dojox/gfx';
+import * as on from 'dojo/on';
 import * as query from 'dojo/query';
+import {PawnImg} from './img/PawnImg';
 
 /**
  * Client implementation of Sorry.
@@ -515,15 +516,17 @@ export default class Sorry extends GameGui {
 
         // create pawns
         for (let pawn of gamedatas.pawns) {
-            let pawnElementId = `pawn-${pawn.player}-${pawn.id}`;
+            const pawnElementId = `pawn-${pawn.player}-${pawn.id}`;
 
-            dom.byId('pawns')!.insertAdjacentHTML('beforeend', `<div class="pawn" data-color="${pawn.color}" id="${pawnElementId}"></div>`);
+            const pawnElement = domConstruct.place(`<div class="pawn" data-color="${pawn.color}" id="${pawnElementId}"></div>`, 'pawns', 'last');
+            on(pawnElement, 'click', (e) => {
+                const clickedPawn = e.currentTarget as HTMLElement;
+                if (domClass.contains(clickedPawn, 'possible-move') && this.checkAction('actSelectPawn', true))
+                    this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
+            });
+
+            new PawnImg().draw(pawnElement);
         }
-        query('.pawn').on('click', (e) => {
-            const clickedPawn = e.currentTarget as HTMLElement;
-            if (domClass.contains(clickedPawn, 'possible-move') && this.checkAction('actSelectPawn', true))
-                this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
-        });
     }
 
     /**
