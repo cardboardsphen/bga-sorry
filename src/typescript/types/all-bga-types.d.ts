@@ -26813,16 +26813,6 @@ declare module 'dojox/gfx' {
      */
     export const pathVmlRegExp: RegExp;
     /**
-     * An object specifying the default properties for a Pattern using in fill operations.
-     *
-     */
-    export const Pattern: Object;
-    /**
-     * Specifies the properties for RadialGradients using in fills patterns.
-     *
-     */
-    export const RadialGradient: Object;
-    /**
      * Either the string name of a renderer (eg. 'canvas', 'svg, ...) or the renderer
      * object to switch to.
      *
@@ -26838,11 +26828,6 @@ declare module 'dojox/gfx' {
      *
      */
     export const silverlight_attach: Object;
-    /**
-     * A stroke defines stylistic properties that are used when drawing a path.
-     *
-     */
-    export const Stroke: Object;
     /**
      * This the graphics rendering bridge for browsers compliant with W3C SVG1.0.
      * This is the preferred renderer to use for interactive and accessible graphics.
@@ -27315,7 +27300,7 @@ declare module 'dojox/gfx' {
          * or dojo/Color)
          *
          */
-        getFill(): defaultFill;
+        getFill(): Fill | null;
         /**
          * Different graphics rendering subsystems implement shapes in different ways.  This
          * method provides access to the underlying graphics subsystem object.  Clients calling this
@@ -27349,7 +27334,7 @@ declare module 'dojox/gfx' {
          * (see dojox/gfx.defaultStroke)
          *
          */
-        getStroke(): defaultStroke;
+        getStroke(): Stroke | null;
         /**
          * Returns the current transformation matrix applied to this Shape or null
          *
@@ -27409,7 +27394,7 @@ declare module 'dojox/gfx' {
          *
          * @param fill a fill object(see dojox/gfx.defaultLinearGradient,dojox/gfx.defaultRadialGradient,dojox/gfx.defaultPattern,or dojo/_base/Color)
          */
-        setFill<TFill extends defaultFill>(fill: string | Color | TFill): Shape<TShape>;
+        setFill(fill: string | Color | defaultFill | defaultPattern | defaultLinearGradient | defaultRadialGradient): Shape<TShape>;
         /**
          * sets a shape object
          * (the default implementation simply ignores it)
@@ -28289,7 +28274,7 @@ declare module 'dojox/gfx' {
          * @param fillArgs
          * @param strokeArgs
          */
-        draw(group: shape.Container, textArgs: Text, fontArgs: Font, fillArgs: Fill, strokeArgs: Stroke): any;
+        draw(group: shape.Container, textArgs: Text, fontArgs: Font, fillArgs: defaultFill | defaultPattern | defaultLinearGradient | defaultRadialGradient, strokeArgs: defaultStroke): any;
         /**
          * Find the baseline coord for alignment; adjust for scale if passed.
          *
@@ -28453,7 +28438,7 @@ declare module 'dojox/gfx' {
          * @param fillArgs
          * @param strokeArgs
          */
-        draw(group: shape.Container, textArgs: Text, fontArgs: Font, fillArgs: Fill, strokeArgs: Stroke): any;
+        draw(group: shape.Container, textArgs: Text, fontArgs: Font, fillArgs: defaultFill | defaultPattern | defaultLinearGradient | defaultRadialGradient, strokeArgs: defaultStroke): any;
         /**
          * Find the baseline coord for alignment; adjust for scale if passed.
          *
@@ -28859,7 +28844,8 @@ declare module 'dojox/gfx' {
         weight: string;
     }
     interface defaultFill {
-        type: string | undefined;
+        type: undefined;
+        color?: string | Color;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.Fill.html
@@ -28868,17 +28854,9 @@ declare module 'dojox/gfx' {
      * See dojox/gfx.LinearGradient, dojox/gfx.RadialGradient and dojox/gfx.Pattern respectively for more information about the properties supported by each type.
      *
      */
-    export interface Fill extends defaultFill {
-        /**
-         * The type of fill. One of 'linear', 'radial', 'pattern' or undefined. If not specified, a solid fill is assumed.
-         *
-         */
-        type: undefined;
-        /**
-         * The color of a solid fill type.
-         *
-         */
-        color: string;
+    class Fill {
+        type: 'linear' | 'radial' | 'pattern' | undefined;
+        color?: string | Color;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.defaultPattern.html
@@ -28886,7 +28864,7 @@ declare module 'dojox/gfx' {
      * An object specifying the default properties for a Pattern using in fill operations.
      *
      */
-    export interface defaultPattern extends defaultFill {
+    export interface defaultPattern {
         /**
          * Specifies this object is a Pattern, value 'pattern'.
          *
@@ -28919,13 +28897,49 @@ declare module 'dojox/gfx' {
         height?: number;
     }
     /**
+     * An object specifying the default properties for a Pattern using in fill operations.
+     *
+     */
+    export class Pattern extends Fill {
+        /**
+         * Specifies this object is a Pattern, value 'pattern'.
+         *
+         */
+        type: 'pattern';
+        /**
+         * A url specifying the image to use for the pattern.
+         *
+         */
+        src: string;
+        /**
+         * The X coordinate of the position of the pattern, default value is 0.
+         *
+         */
+        x: number;
+        /**
+         * The Y coordinate of the position of the pattern, default value is 0.
+         *
+         */
+        y: number;
+        /**
+         * The width of the pattern image, default value is 0.
+         *
+         */
+        width: number;
+        /**
+         * The height of the pattern image, default value is 0.
+         *
+         */
+        height: number;
+    }
+    /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.defaultLinearGradient.html
      *
      * An object defining the default stylistic properties used for Linear Gradient fills.
      * Linear gradients are drawn along a virtual line, which results in appearance of a rotated pattern in a given direction/orientation.
      *
      */
-    export interface defaultLinearGradient extends defaultFill {
+    export interface defaultLinearGradient {
         /**
          * Specifies this object is a Linear Gradient, value 'linear'
          *
@@ -28960,12 +28974,50 @@ declare module 'dojox/gfx' {
         y2?: number;
     }
     /**
+     * Specifies the properties for LinearGradients using in fills patterns.
+     *
+     */
+    export class LinearGradient extends Fill {
+        /**
+         * Specifies this object is a Linear Gradient, value 'linear'
+         *
+         */
+        type: 'linear';
+        /**
+         * An array of colors at given offsets (from the start of the line).  The start of the line is
+         * defined at offest 0 with the end of the line at offset 1.
+         * Default value, [{ offset: 0, color: 'black'},{offset: 1, color: 'white'}], is a gradient from black to white.
+         *
+         */
+        colors: {offset: number, color: string | Color}[];
+        /**
+         * The X coordinate of the start of the virtual line along which the gradient is drawn, default value 0.
+         *
+         */
+        x1: number;
+        /**
+         * The X coordinate of the end of the virtual line along which the gradient is drawn, default value 100.
+         *
+         */
+        x2: number;
+        /**
+         * The Y coordinate of the start of the virtual line along which the gradient is drawn, default value 0.
+         *
+         */
+        y1: number;
+        /**
+         * The Y coordinate of the end of the virtual line along which the gradient is drawn, default value 100.
+         *
+         */
+        y2: number;
+    }
+    /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.defaultRadialGradient.html
      *
      * An object specifying the default properties for RadialGradients using in fills patterns.
      *
      */
-    export interface defaultRadialGradient extends defaultFill {
+    export interface defaultRadialGradient {
         /**
          * Specifies this is a RadialGradient, value 'radial'
          *
@@ -28993,6 +29045,39 @@ declare module 'dojox/gfx' {
          *
          */
         r?: number;
+    }
+    /**
+     * Specifies the properties for RadialGradients using in fills patterns.
+     *
+     */
+    export class RadialGradient extends Fill {
+        /**
+         * Specifies this is a RadialGradient, value 'radial'
+         *
+         */
+        type: 'radial';
+        /**
+         * An array of colors at given offsets (from the center of the radial gradient).
+         * The center is defined at offest 0 with the outer edge of the gradient at offset 1.
+         * Default value, [{ offset: 0, color: 'black'},{offset: 1, color: 'white'}], is a gradient from black to white.
+         *
+         */
+        colors: any[];
+        /**
+         * The X coordinate of the center of the radial gradient, default value 0.
+         *
+         */
+        cx: number;
+        /**
+         * The Y coordinate of the center of the radial gradient, default value 0.
+         *
+         */
+        cy: number;
+        /**
+         * The radius to the end of the radial gradient, default value 100.
+         *
+         */
+        r: number;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.defaultStroke.html
@@ -29032,6 +29117,44 @@ declare module 'dojox/gfx' {
          *
          */
         width?: number;
+    }
+    /**
+     * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.Stroke.html
+     *
+     * A stroke defines stylistic properties that are used when drawing a path.
+     *
+     */
+    export class Stroke {
+        /**
+         * Specifies this object is a type of Stroke, value 'stroke'.
+         *
+         */
+        type: 'stroke';
+        /**
+         * The endcap style of the path. One of 'butt', 'round', ... . Default value 'butt'.
+         *
+         */
+        cap: 'butt' | 'round' | 'square';
+        /**
+         * The color of the stroke, default value 'black'.
+         *
+         */
+        color: string;
+        /**
+         * The join style to use when combining path segments. Default value 4.
+         *
+         */
+        join: 'round' | 'bevel' | number;
+        /**
+         * The style of the stroke, one of 'solid', ... . Default value 'solid'.
+         *
+         */
+        style: 'Solid' | 'ShortDash' | 'ShortDot' | 'ShortDashDot' | 'ShortDashDotDot' | 'Dot' | 'Dash' | 'LongDash' | 'DashDot' | 'LongDashDot' | 'LongDashDotDot' | 'none';
+        /**
+         * The width of a stroke, default value 1.
+         *
+         */
+        width: number;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.defaultVectorFont.html
@@ -29732,39 +29855,6 @@ declare module 'dojox/gfx' {
          *
          */
         TextPath(): void;
-    }
-    /**
-     * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.Stroke.html
-     *
-     * A stroke defines stylistic properties that are used when drawing a path.
-     *
-     */
-    export interface Stroke {
-        /**
-         * The endcap style of the path. One of 'butt', 'round', ... . Default value 'butt'.
-         *
-         */
-        cap: string;
-        /**
-         * The color of the stroke, default value 'black'.
-         *
-         */
-        color: string;
-        /**
-         * The join style to use when combining path segments. Default value 4.
-         *
-         */
-        join: number;
-        /**
-         * The style of the stroke, one of 'solid', ... . Default value 'solid'.
-         *
-         */
-        style: string;
-        /**
-         * The width of a stroke, default value 1.
-         *
-         */
-        width: number;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx/svgext.html

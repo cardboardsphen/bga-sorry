@@ -14,16 +14,25 @@ export interface Img {
 export class ImgBase {
     resizeAllShapes(container: gfx.Surface | gfx.Group, scaleX: number, scaleY: number): void {
         container.children.forEach((child) => {
-            alert(child.shape.type);
             if (child instanceof gfx.Group) {
                 this.resizeAllShapes(child, scaleX, scaleY);
             } else {
                 if (child instanceof gfx.Circle) {
+                    //if (scaleX == scaleY) {
                     child.setShape({
                         cx: child.shape.cx * scaleX,
                         cy: child.shape.cy * scaleY,
-                        r: child.shape.r * Math.min(scaleX, scaleY),
+                        r: child.shape.r * scaleX,
                     });
+                    //} else {
+                    //    child.setShape({
+                    //        type: 'ellipse',
+                    //        cx: child.shape.cx * scaleX,
+                    //        cy: child.shape.cy * scaleY,
+                    //        rx: child.shape.r * scaleX,
+                    //        ry: child.shape.r * scaleY,
+                    //    });
+                    //}
                 } else if (child instanceof gfx.Rect) {
                     child.setShape({
                         x: child.shape.x * scaleX,
@@ -54,17 +63,33 @@ export class ImgBase {
                     });
                 }
             }
-            const fill = child.getFill()
-            if (fill instanceof gfx.defaultPattern) {
+            const fill = child.getFill();
+            if (fill instanceof gfx.Pattern) {
                 child.setFill({
-                    type: 'patterns',
+                    type: 'pattern',
+                    src: fill.src,
                     x: fill.x * scaleX,
                     y: fill.y * scaleY,
-                })
-            } else if (fill instanceof gfx.defaultLinearGradient) {
-
-            } else if (fill instanceof gfx.defaultRadialGradient) {
-
+                    width: fill.width * scaleX,
+                    height: fill.height * scaleY,
+                });
+            } else if (fill instanceof gfx.LinearGradient) {
+                child.setFill({
+                    type: 'linear',
+                    colors: fill.colors,
+                    x1: fill.x1 * scaleX,
+                    x2: fill.x2 * scaleX,
+                    y1: fill.y1 * scaleY,
+                    y2: fill.y2 * scaleY,
+                });
+            } else if (fill instanceof gfx.RadialGradient) {
+                child.setFill({
+                    type: 'radial',
+                    colors: fill.colors,
+                    cx: fill.cx * scaleX,
+                    cy: fill.cy * scaleY,
+                    r: fill.r * Math.sqrt(scaleX ** 2 + scaleY ** 2), // this is kind of a compromise because there's no EllipticalGradient, so I just split the difference
+                });
             }
         });
     }
