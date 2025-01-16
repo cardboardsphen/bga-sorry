@@ -525,7 +525,7 @@ export default class Sorry extends GameGui {
                     this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
             });
 
-            new PawnImg().draw(pawnElement);
+            new PawnImg().draw({container: pawnElement, color: 'red'});
         }
     }
 

@@ -1,7 +1,7 @@
 import * as gfx from 'dojox/gfx';
 
 export interface Img {
-    draw(container: HTMLElement | Node | string): void;
+    draw(options: {container: HTMLElement | Node | string}): void;
     /**
      * Recursively resizes all shapes in a container (surface or group).
      *
@@ -14,6 +14,7 @@ export interface Img {
 export class ImgBase {
     resizeAllShapes(container: gfx.Surface | gfx.Group, scaleX: number, scaleY: number): void {
         container.children.forEach((child) => {
+            alert(child.shape.type);
             if (child instanceof gfx.Group) {
                 this.resizeAllShapes(child, scaleX, scaleY);
             } else {
@@ -52,6 +53,18 @@ export class ImgBase {
                         })),
                     });
                 }
+            }
+            const fill = child.getFill()
+            if (fill instanceof gfx.defaultPattern) {
+                child.setFill({
+                    type: 'patterns',
+                    x: fill.x * scaleX,
+                    y: fill.y * scaleY,
+                })
+            } else if (fill instanceof gfx.defaultLinearGradient) {
+
+            } else if (fill instanceof gfx.defaultRadialGradient) {
+
             }
         });
     }

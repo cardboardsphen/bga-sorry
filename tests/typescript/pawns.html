@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawns Test</title>
+    <style>
+        td {
+            padding: 10px;
+        }
+        .pawn {
+            width: 400px;
+            height: 400px;
+            /*border-radius: 50%;*/
+            border: 1px solid black;
+            /*position: absolute;*/
+            /*background-image: url(../../img/pawns.png);*/
+            cursor: cell;
+
+            z-index: 1;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/dojo/dojo.js"></script>
+    <script>var exports = {};</script>
+    <script src="pawns.js"></script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td><div class="pawn" data-color="red"></div></td>
+            <td><div class="pawn" data-color="blue"></div></td>
+        </tr><tr>
+            <td><div class="pawn" data-color="green"></div></td>
+            <td><div class="pawn" data-color="yellow"></div></td>
+        </tr>
+    </table>
+</body>
+</html>
