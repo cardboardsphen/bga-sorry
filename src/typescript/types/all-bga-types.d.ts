@@ -30436,6 +30436,39 @@ declare module 'dojox/gfx' {
 }
 
 declare module 'dojox/gfx/fx' {
-    export function animateTransform({
-    }): DojoJS.Animation;
+    import gfx = require('dojox/gfx');
+    import Color = require('dojo/_base/Color');
+
+    interface EasingFunction {
+        (n: number): number;
+    }
+    interface AnimationCallback {
+        (node: HTMLElement): void;
+    }
+    interface GfxAnimationArguments {
+        shape: gfx.Shape;
+        duration?: number;
+        easing?: EasingFunction;
+        delay?: number;
+        beforeBegin?: () => void;
+        onBegin?: AnimationCallback;
+        onPlay?: AnimationCallback;
+        onAnimate?: AnimationCallback;
+        onPause?: AnimationCallback;
+        onEnd?: () => void;
+        onStop?: AnimationCallback;
+    }
+    interface TransformAnimationArguments extends GfxAnimationArguments {
+        transform: {name: string, start: any, end: any}[];
+    }
+    interface StrokeAnimationArguments extends GfxAnimationArguments {
+    }
+    interface FontAnimationArguments extends GfxAnimationArguments {
+    }
+    interface FillAnimationArguments extends GfxAnimationArguments {
+    }
+    export function animateTransform(args: TransformAnimationArguments): DojoJS.Animation;
+    export function animateStroke(args: StrokeAnimationArguments): DojoJS.Animation;
+    export function animateFont(args: FontAnimationArguments): DojoJS.Animation;
+    export function animateFill(args: FillAnimationArguments): DojoJS.Animation;
 }
