@@ -73,43 +73,15 @@
     top: 676px;
 }
 
-@keyframes jumpping-pawn {
-    0% {
-        transform: none;
-    }
-    50% {
-        transform: scale(1.25) translateZ(50px);
-    }
-    100% {
-        transform: none;
-    }
-}
-
 .pawn {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     position: absolute;
-    background-image: url('img/pawns.png');
     z-index: 1;
 
-    &[data-color='red'] {
-        background-position: 0% 0%;
-    }
-    &[data-color='blue'] {
-        background-position: 100% 0%;
-    }
-    &[data-color='yellow'] {
-        background-position: 100% 100%;
-    }
-    &[data-color='green'] {
-        background-position: 0% 100%;
-    }
-
-    &.jumpping {
-        animation-name: jumpping-pawn;
-        animation-duration: 1s; // overridden in element animation
-        animation-timing-function: ease-in-out;
+    & > * {
+        overflow: visible;
     }
 }
 

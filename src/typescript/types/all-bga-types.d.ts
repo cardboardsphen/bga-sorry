@@ -26951,7 +26951,7 @@ declare module 'dojox/gfx' {
      *
      * @param color A color representation.
      */
-    export function normalizeColor(color: DojoJS.Color): any;
+    export function normalizeColor(color: Color): any;
     /**
      * converts any legal color representation to normalized
      * dojo/Color object
@@ -27285,7 +27285,7 @@ declare module 'dojox/gfx' {
         /**
          *
          */
-        getClip(): any;
+        getClip<T extends Shape>(): T | null;
         /**
          * returns a Node, which is used as
          * a source of events for this shape
@@ -27387,7 +27387,7 @@ declare module 'dojox/gfx' {
          *
          * @param clip
          */
-        setClip(clip: any): void;
+        setClip<T extends defaultShape>(clip: T): Shape<TShape>;
         /**
          * sets a fill object
          * (the default implementation simply ignores it)
@@ -27414,7 +27414,7 @@ declare module 'dojox/gfx' {
          *
          * @param matrix a matrix or a matrix-like object(see an argument of dojox/gfx/matrix.Matrix2Dconstructor for a list of acceptable arguments)
          */
-        setTransform(matrix: matrix.Matrix2D): any;
+        setTransform(matrix: matrix.Matrix2D | null): Shape<TShape>;
     }
     /**
      * Permalink: http://dojotoolkit.org/api/1.10/dojox/gfx.Circle.html
@@ -28844,7 +28844,7 @@ declare module 'dojox/gfx' {
         weight: string;
     }
     interface defaultFill {
-        type: undefined;
+        type?: undefined;
         color?: string | Color;
     }
     /**
@@ -28855,7 +28855,7 @@ declare module 'dojox/gfx' {
      *
      */
     class Fill {
-        type: 'linear' | 'radial' | 'pattern' | undefined;
+        type?: 'linear' | 'radial' | 'pattern';
         color?: string | Color;
     }
     /**
@@ -29362,52 +29362,52 @@ declare module 'dojox/gfx' {
      *
      *
      */
-    export interface matrix {
+    export namespace matrix {
         /**
          * a matrix, which reflects points at x = 0 line: flipX * (x, y) == (-x, y)
          *
          */
-        flipX: Object;
+        const flipX: Object;
         /**
          * a matrix, which reflects points at the origin of coordinates: flipXY * (x, y) == (-x, -y)
          *
          */
-        flipXY: Object;
+        const flipXY: Object;
         /**
          * a matrix, which reflects points at y = 0 line: flipY * (x, y) == (x, -y)
          *
          */
-        flipY: Object;
+        const flipY: Object;
         /**
          * an identity matrix constant: identity * (x, y) == (x, y)
          *
          */
-        identity: Object;
+        const identity: Object;
         /**
          * creates a copy of a 2D matrix
          *
          * @param matrix a 2D matrix-like object to be cloned
          */
-        clone(matrix: matrix.Matrix2D): matrix.Matrix2D;
+        function clone(matrix: matrix.Matrix2D): matrix.Matrix2D;
         /**
          * inverts a 2D matrix
          *
          * @param matrix a 2D matrix-like object to be inverted
          */
-        invert(matrix: matrix.Matrix2D): matrix.Matrix2D;
+        function invert(matrix: matrix.Matrix2D): matrix.Matrix2D;
         /**
          * returns whether the specified matrix is the identity.
          *
          * @param matrix a 2D matrix object to be tested
          */
-        isIdentity(matrix: matrix.Matrix2D): boolean;
+        function isIdentity(matrix: matrix.Matrix2D): boolean;
 
         /**
          * combines matrices by multiplying them sequentially in the given order
          *
          * @param matrix a 2D matrix-like object,all subsequent arguments are matrix-like objects too
          */
-        multiply(matrix: matrix.Matrix2D): any;
+        function multiply(matrix: matrix.Matrix2D): any;
         /**
          * applies a matrix to a point
          *
@@ -29415,7 +29415,7 @@ declare module 'dojox/gfx' {
          * @param a an x coordinate of a point, or a point
          * @param b               Optionala y coordinate of a point
          */
-        multiplyPoint(matrix: matrix.Matrix2D, a: number, b: number): Point;
+        function multiplyPoint(matrix: matrix.Matrix2D, a: number, b: number): Point;
         /**
          * applies a matrix to a point
          *
@@ -29423,7 +29423,7 @@ declare module 'dojox/gfx' {
          * @param a an x coordinate of a point, or a point
          * @param b               Optionala y coordinate of a point
          */
-        multiplyPoint(matrix: matrix.Matrix2D, a: Point, b: number): Point;
+        function multiplyPoint(matrix: matrix.Matrix2D, a: Point, b: number): Point;
         /**
          * Applies a matrix to a rectangle.
          * The method applies the transformation on all corners of the
@@ -29433,7 +29433,7 @@ declare module 'dojox/gfx' {
          * @param matrix a 2D matrix object to be applied.
          * @param rect the rectangle to transform.
          */
-        multiplyRectangle(matrix: matrix.Matrix2D, rect: Rect): Rect;
+        function multiplyRectangle(matrix: matrix.Matrix2D, rect: Rect): Rect;
         /**
          * converts an object to a matrix, if necessary
          * Converts any 2D matrix-like object or an array of
@@ -29441,7 +29441,7 @@ declare module 'dojox/gfx' {
          *
          * @param matrix an object, which is converted to a matrix, if necessary
          */
-        normalize(matrix: Object): matrix.Matrix2D;
+        function normalize(matrix: Object): matrix.Matrix2D;
         /**
          * forms an orthogonal projection matrix
          * The resulting matrix is used to project points orthogonally on a vector,
@@ -29450,7 +29450,7 @@ declare module 'dojox/gfx' {
          * @param a a point-like object, which specifies a vector of projection, oran x coordinate value
          * @param b               Optionala y coordinate value
          */
-        project(a: Point, b: number): matrix.Matrix2D;
+        function project(a: Point, b: number): matrix.Matrix2D;
         /**
          * forms an orthogonal projection matrix
          * The resulting matrix is used to project points orthogonally on a vector,
@@ -29459,7 +29459,7 @@ declare module 'dojox/gfx' {
          * @param a a point-like object, which specifies a vector of projection, oran x coordinate value
          * @param b               Optionala y coordinate value
          */
-        project(a: number, b: number): matrix.Matrix2D;
+        function project(a: number, b: number): matrix.Matrix2D;
         /**
          * forms a reflection matrix
          * The resulting matrix is used to reflect points around a vector,
@@ -29468,7 +29468,7 @@ declare module 'dojox/gfx' {
          * @param a a point-like object, which specifies a vector of reflection, or an X value
          * @param b               Optionala Y value
          */
-        reflect(a: Point, b: number): matrix.Matrix2D;
+        function reflect(a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a reflection matrix
          * The resulting matrix is used to reflect points around a vector,
@@ -29477,7 +29477,7 @@ declare module 'dojox/gfx' {
          * @param a a point-like object, which specifies a vector of reflection, or an X value
          * @param b               Optionala Y value
          */
-        reflect(a: number, b: number): matrix.Matrix2D;
+        function reflect(a: number, b: number): matrix.Matrix2D;
         /**
          * forms a rotating matrix
          * The resulting matrix is used to rotate points
@@ -29485,7 +29485,7 @@ declare module 'dojox/gfx' {
          *
          * @param angle an angle of rotation in radians (>0 for CW)
          */
-        rotate(angle: number): matrix.Matrix2D;
+        function rotate(angle: number): matrix.Matrix2D;
         /**
          * rotates a picture using a specified point as a center of rotation
          * Compare with dojox/gfx/matrix.rotate().
@@ -29494,7 +29494,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        rotateAt(angle: number, a: number, b: number): matrix.Matrix2D;
+        function rotateAt(angle: number, a: number, b: number): matrix.Matrix2D;
         /**
          * rotates a picture using a specified point as a center of rotation
          * Compare with dojox/gfx/matrix.rotate().
@@ -29503,7 +29503,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        rotateAt(angle: number, a: Point, b: number): matrix.Matrix2D;
+        function rotateAt(angle: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a rotating matrix
          * The resulting matrix is used to rotate points
@@ -29512,7 +29512,7 @@ declare module 'dojox/gfx' {
          *
          * @param degree an angle of rotation in degrees (>0 for CW)
          */
-        rotateg(degree: number): matrix.Matrix2D;
+        function rotateg(degree: number): matrix.Matrix2D;
         /**
          * rotates a picture using a specified point as a center of rotation
          * Compare with dojox/gfx/matrix.rotateg().
@@ -29521,7 +29521,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        rotategAt(degree: number, a: number, b: number): matrix.Matrix2D;
+        function rotategAt(degree: number, a: number, b: number): matrix.Matrix2D;
         /**
          * rotates a picture using a specified point as a center of rotation
          * Compare with dojox/gfx/matrix.rotateg().
@@ -29530,7 +29530,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        rotategAt(degree: number, a: Point, b: number): matrix.Matrix2D;
+        function rotategAt(degree: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a scaling matrix
          * The resulting matrix is used to scale (magnify) points by specified offsets.
@@ -29538,7 +29538,7 @@ declare module 'dojox/gfx' {
          * @param a a scaling factor used for the x coordinate, ora uniform scaling factor used for the both coordinates, ora point-like object, which specifies scale factors for both dimensions
          * @param b               Optionala scaling factor used for the y coordinate
          */
-        scale(a: number, b: number): matrix.Matrix2D;
+        function scale(a: number, b: number): matrix.Matrix2D;
         /**
          * forms a scaling matrix
          * The resulting matrix is used to scale (magnify) points by specified offsets.
@@ -29546,7 +29546,7 @@ declare module 'dojox/gfx' {
          * @param a a scaling factor used for the x coordinate, ora uniform scaling factor used for the both coordinates, ora point-like object, which specifies scale factors for both dimensions
          * @param b               Optionala scaling factor used for the y coordinate
          */
-        scale(a: Point, b: number): matrix.Matrix2D;
+        function scale(a: Point, b: number): matrix.Matrix2D;
         /**
          * scales a picture using a specified point as a center of scaling
          * Compare with dojox/gfx/matrix.scale().
@@ -29556,7 +29556,7 @@ declare module 'dojox/gfx' {
          * @param c an x component of a central point, or a central point
          * @param d a y component of a central point
          */
-        scaleAt(a: number, b: number, c: number, d: number): matrix.Matrix2D;
+        function scaleAt(a: number, c: number, d: number): matrix.Matrix2D;
         /**
          * scales a picture using a specified point as a center of scaling
          * Compare with dojox/gfx/matrix.scale().
@@ -29566,7 +29566,7 @@ declare module 'dojox/gfx' {
          * @param c an x component of a central point, or a central point
          * @param d a y component of a central point
          */
-        scaleAt(a: number, b: number, c: Point, d: number): matrix.Matrix2D;
+        function scaleAt(a: number, b: number, c: Point, d: number): matrix.Matrix2D;
         /**
          * forms an x skewing matrix
          * The resulting matrix is used to skew points in the x dimension
@@ -29574,7 +29574,7 @@ declare module 'dojox/gfx' {
          *
          * @param angle a skewing angle in radians
          */
-        skewX(angle: number): matrix.Matrix2D;
+        function skewX(angle: number): matrix.Matrix2D;
         /**
          * skews a picture along the x axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewX().
@@ -29583,7 +29583,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewXAt(angle: number, a: number, b: number): matrix.Matrix2D;
+        function skewXAt(angle: number, a: number, b: number): matrix.Matrix2D;
         /**
          * skews a picture along the x axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewX().
@@ -29592,7 +29592,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewXAt(angle: number, a: Point, b: number): matrix.Matrix2D;
+        function skewXAt(angle: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms an x skewing matrix
          * The resulting matrix is used to skew points in the x dimension
@@ -29601,7 +29601,7 @@ declare module 'dojox/gfx' {
          *
          * @param degree a skewing angle in degrees
          */
-        skewXg(degree: number): matrix.Matrix2D;
+        function skewXg(degree: number): matrix.Matrix2D;
         /**
          * skews a picture along the x axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewXg().
@@ -29610,7 +29610,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewXgAt(degree: number, a: number, b: number): matrix.Matrix2D;
+        function skewXgAt(degree: number, a: number, b: number): matrix.Matrix2D;
         /**
          * skews a picture along the x axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewXg().
@@ -29619,7 +29619,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewXgAt(degree: number, a: Point, b: number): matrix.Matrix2D;
+        function skewXgAt(degree: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a y skewing matrix
          * The resulting matrix is used to skew points in the y dimension
@@ -29627,7 +29627,7 @@ declare module 'dojox/gfx' {
          *
          * @param angle a skewing angle in radians
          */
-        skewY(angle: number): matrix.Matrix2D;
+        function skewY(angle: number): matrix.Matrix2D;
         /**
          * skews a picture along the y axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewY().
@@ -29636,7 +29636,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewYAt(angle: number, a: number, b: number): matrix.Matrix2D;
+        function skewYAt(angle: number, a: number, b: number): matrix.Matrix2D;
         /**
          * skews a picture along the y axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewY().
@@ -29645,7 +29645,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewYAt(angle: number, a: Point, b: number): matrix.Matrix2D;
+        function skewYAt(angle: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a y skewing matrix
          * The resulting matrix is used to skew points in the y dimension
@@ -29654,7 +29654,7 @@ declare module 'dojox/gfx' {
          *
          * @param degree a skewing angle in degrees
          */
-        skewYg(degree: number): matrix.Matrix2D;
+        function skewYg(degree: number): matrix.Matrix2D;
         /**
          * skews a picture along the y axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewYg().
@@ -29663,7 +29663,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewYgAt(degree: number, a: number, b: number): matrix.Matrix2D;
+        function skewYgAt(degree: number, a: number, b: number): matrix.Matrix2D;
         /**
          * skews a picture along the y axis using a specified point as a center of skewing
          * Compare with dojox/gfx/matrix.skewYg().
@@ -29672,7 +29672,7 @@ declare module 'dojox/gfx' {
          * @param a an x component of a central point, or a central point
          * @param b               Optionala y component of a central point
          */
-        skewYgAt(degree: number, a: Point, b: number): matrix.Matrix2D;
+        function skewYgAt(degree: number, a: Point, b: number): matrix.Matrix2D;
         /**
          * forms a translation matrix
          * The resulting matrix is used to translate (move) points by specified offsets.
@@ -29680,7 +29680,7 @@ declare module 'dojox/gfx' {
          * @param a an x coordinate value, or a point-like object, which specifies offsets for both dimensions
          * @param b               Optionala y coordinate value
          */
-        translate(a: number, b: number): matrix.Matrix2D;
+        function translate(a: number, b: number): matrix.Matrix2D;
         /**
          * forms a translation matrix
          * The resulting matrix is used to translate (move) points by specified offsets.
@@ -29688,9 +29688,7 @@ declare module 'dojox/gfx' {
          * @param a an x coordinate value, or a point-like object, which specifies offsets for both dimensions
          * @param b               Optionala y coordinate value
          */
-        translate(a: Point, b: number): matrix.Matrix2D;
-    }
-    export namespace matrix {
+        function translate(a: Point, b: number): matrix.Matrix2D;
         /**
          * a 2D matrix object
          * Normalizes a 2D matrix-like object. If arrays is passed,
@@ -30435,4 +30433,9 @@ declare module 'dojox/gfx' {
          */
         class Creator {}
     }
+}
+
+declare module 'dojox/gfx/fx' {
+    export function animateTransform({
+    }): DojoJS.Animation;
 }

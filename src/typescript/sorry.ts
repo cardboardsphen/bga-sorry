@@ -11,9 +11,11 @@ import * as domConstruct from 'dojo/dom-construct';
 import * as domProp from 'dojo/dom-prop';
 import * as domStyle from 'dojo/dom-style';
 import * as fx from 'dojo/fx';
+import * as gfx from 'dojox/gfx';
+import * as gfxFx from 'dojox/gfx/fx';
 import * as on from 'dojo/on';
 import * as query from 'dojo/query';
-import {PawnImg} from './img/PawnImg';
+import {PawnGraphic} from './graphics/PawnGraphic';
 
 /**
  * Client implementation of Sorry.
@@ -525,7 +527,8 @@ export default class Sorry extends GameGui {
                     this.bgaPerformAction('actSelectPawn', {pawnId: clickedPawn.id.match(/\d+$/)});
             });
 
-            new PawnImg().draw({container: pawnElement, color: 'red'});
+            const color = domAttr.get(pawnElement, 'data-color') as string;
+            new PawnGraphic().draw({container: pawnElement, color: color});
         }
     }
 
@@ -755,31 +758,75 @@ export default class Sorry extends GameGui {
     }
 
     getPawnMoveAnimation(move: PawnMove, moveDelayReference: number = 0): DojoJS.Animation {
-        return dojo.animateProperty({
-            node: move.pawn,
-            properties: {
-                left: {start: move.startingLeft, end: move.startingLeft + move.offsetLeft},
-                top: {start: move.startingTop, end: move.startingTop + move.offsetTop},
-            },
-            delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
-            duration: move.durationMilliseconds,
-            easing(x) {
-                return 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866;
-            },
-            onBegin() {
-                domStyle.set(move.pawn, {zIndex: '4'});
-                if (move.moveType === 'jump') {
-                    domStyle.set(move.pawn, {
-                        animationDuration: `${move.durationMilliseconds}ms`,
-                    });
-                    domClass.add(move.pawn, 'jumpping');
-                }
-            },
-            onEnd() {
-                domClass.remove(move.pawn, 'jumpping');
-                domStyle.set(move.pawn, {zIndex: ''});
-            },
-        });
+        let moveAnimations = [
+            dojo.animateProperty({
+                node: move.pawn,
+                properties: {
+                    left: {start: move.startingLeft, end: move.startingLeft + move.offsetLeft},
+                    top: {start: move.startingTop, end: move.startingTop + move.offsetTop},
+                },
+                delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
+                duration: move.durationMilliseconds,
+                easing(x) {
+                    return 0.56815808768082454 * Math.sin((0.7 * x - 0.3) * Math.PI) + 0.45964954842535866;
+                },
+                onBegin() { domStyle.set(move.pawn, {zIndex: '4'}); },
+                onEnd() { domStyle.set(move.pawn, {zIndex: ''}); },
+            })
+        ];
+
+        if (move.moveType === 'jump') {
+            moveAnimations.push(
+                fx.chain([
+                    dojo.animateProperty({
+                        node: move.pawn,
+                        properties: {
+                            translateZ: {start: 0, end: 50, units: 'px'},
+                        },
+                        delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
+                        duration: move.durationMilliseconds / 2,
+                        onAnimate(p: any) {
+                            domStyle.set(move.pawn, 'transform', `translateZ(${p.translateZ})`);
+                        },
+                    }),
+                    dojo.animateProperty({
+                        node: move.pawn,
+                        properties: {
+                            translateZ: {start: 50, end: 0, units: 'px'},
+                        },
+                        duration: move.durationMilliseconds / 2,
+                        onAnimate(p: any) {
+                            domStyle.set(move.pawn, 'transform', `translateZ(${p.translateZ})`);
+                        },
+                    }),
+                ])
+            );
+            const pawnGraphicSurface = (move.pawn as any).gfxSurface as gfx.Surface;
+            const pawnGraphic = pawnGraphicSurface.children[0]!;
+            moveAnimations.push(
+                fx.chain([
+                    gfxFx.animateTransform({
+                        shape: pawnGraphic,
+                        transform: [
+                            { name: "scaleAt", start: [1, 1, 20, 20], end: [1.25, 1.25, 20, 20] }
+                        ],
+                        delay: (move.startMoveAtPercentage / 100) * moveDelayReference,
+                        duration: move.durationMilliseconds / 2,
+                    }),
+                    gfxFx.animateTransform({
+                        shape: pawnGraphic,
+                        transform: [
+                            { name: "scaleAt", start: [1.25, 1.25, 20, 20], end: [1, 1, 20, 20] }
+                        ],
+                        duration: move.durationMilliseconds / 2,
+                        onEnd() {
+                            pawnGraphic.setTransform(null);
+                        },
+                    })
+                ])
+            );
+        }
+        return fx.combine(moveAnimations);
     }
 
     playAllAnimations(animations: DojoJS.Animation[]): Promise<void> {

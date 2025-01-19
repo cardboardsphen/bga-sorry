@@ -11,13 +11,16 @@
         .pawn {
             width: 400px;
             height: 400px;
-            /*border-radius: 50%;*/
+            border-radius: 50%;
             border: 1px solid black;
             /*position: absolute;*/
-            /*background-image: url(../../img/pawns.png);*/
             cursor: cell;
 
             z-index: 1;
+        }
+
+        .pawn > * {
+            overflow: visible;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.14.1/dojo/dojo.js"></script>
